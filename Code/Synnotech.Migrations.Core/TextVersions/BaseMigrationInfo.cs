@@ -9,7 +9,7 @@ namespace Synnotech.Migrations.Core.TextVersions
     /// Base class for default migration infos that uses a version internally.
     /// This version is serialized as a string. by default in the format x.x.x
     /// (semantic version). All properties are mutable to support
-    /// serialization to document or relational databases.
+    /// serialization to document or relational databases with different frameworks.
     /// </summary>
     public abstract class BaseMigrationInfo : IComparable<MigrationVersionAttribute>
     {

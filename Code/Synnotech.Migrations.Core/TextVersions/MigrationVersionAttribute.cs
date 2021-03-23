@@ -31,11 +31,10 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// </summary>
         public Version Version => _version ?? throw new ArgumentException($"The specified version {_versionText.ToStringOrNull()} cannot be parsed.");
 
-
+        /// <inheritdoc />
         public void Validate(Type migrationType)
         {
             if (_version == null)
-                throw new ArgumentException($"The specified version \"{_versionText}\" of migration \"{migrationType}\" cannot be parsed.");
-        }
+                throw new ArgumentException($"The specified version {_versionText.ToStringOrNull()} of migration {migrationType.ToStringOrNull()} cannot be parsed.");}
     }
 }
