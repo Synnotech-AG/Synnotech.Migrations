@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
+	</ItemGroup>
+</Project>
