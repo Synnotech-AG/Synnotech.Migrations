@@ -32,6 +32,11 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
 
         Task IAsyncMigrationSession<TMigrationInfo>.StoreMigrationInfoAsync(TMigrationInfo migrationInfo) =>
             Session.StoreAsync(migrationInfo, "migrationInfos" + Session.Advanced.DocumentStore.Conventions.IdentityPartsSeparator + migrationInfo.Version);
+
+        /// <summary>
+        /// Gets the session object used to query or update the target database.
+        /// </summary>
+        public new IAsyncDocumentSession Session => base.Session;
     }
 
     /// <summary>
