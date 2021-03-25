@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
+using Synnotech.Migrations.Core;
 using Synnotech.Migrations.Core.TextVersions;
 using Synnotech.Migrations.RavenDB.TextVersions;
 using Xunit;
@@ -87,6 +89,22 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             summary.AppliedMigrations.Should().BeNullOrEmpty();
             var entities = await session.Query<Entity>().ToListAsync();
             entities.Should().BeNullOrEmpty();
+        }
+
+        [SkippableFact]
+        public async Task GetMigrationPlan()
+        {
+            TestSettings.SkipDatabaseIntegrationTestIfNecessary();
+
+            var now = DateTime.UtcNow;
+            var services = new ServiceCollection().AddSingleton(GetDocumentStore())
+                                                  .AddSynnotechMigrations();
+
+            var migrationEngine = services.BuildServiceProvider().GetRequiredService<MigrationEngine>();
+            var migrationPlan = await migrationEngine.GenerateMigrationPlanAsync(typeof(AsyncRavenMigrationEngineTests).Assembly);
+
+            var expectedPlan = new MigrationPlan<Migration, MigrationInfo>(null, new List<Migration> { new FirstMigration(), new SecondMigration() });
+            migrationPlan.Should().Be(expectedPlan);
         }
 
         [MigrationVersion("1.0.0")]
