@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Light.GuardClauses;
+using Light.GuardClauses.FrameworkExtensions;
 
 namespace Synnotech.Migrations.Core
 {
@@ -8,7 +10,7 @@ namespace Synnotech.Migrations.Core
     /// Represents the summary of a migration run.
     /// </summary>
     /// <typeparam name="TMigrationInfo">The type that is stored in the target system to identify which migrations have already been applied.</typeparam>
-    public readonly struct MigrationSummary<TMigrationInfo>
+    public readonly struct MigrationSummary<TMigrationInfo> : IEquatable<MigrationSummary<TMigrationInfo>>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="MigrationSummary{TMigrationInfo}" /> that indicates that migrations were applied successfully.
@@ -34,7 +36,7 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Gets an empty instance, indicating that no migrations were applied.
         /// </summary>
-        public static MigrationSummary<TMigrationInfo> Empty => new MigrationSummary<TMigrationInfo>();
+        public static MigrationSummary<TMigrationInfo> Empty => new();
 
         /// <summary>
         /// Gets the collection of migrations that were applied.
@@ -84,5 +86,65 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         /// <exception cref="MigrationException">Thrown when this summary contains a <see cref="MigrationError" />.</exception>
         public void EnsureSuccess() => MigrationError?.Rethrow();
+
+        /// <summary>
+        /// Checks if the specified migration summary is equal to this instance.
+        /// This is true when the migration error and all applied migrations are equal.
+        /// </summary>
+        public bool Equals(MigrationSummary<TMigrationInfo> other)
+        {
+            if (MigrationError != other.MigrationError)
+                return false;
+            if (AppliedMigrations?.Count != other.AppliedMigrations?.Count || AppliedMigrations.IsNullOrEmpty())
+                return false;
+
+            for (var i = 0; i < AppliedMigrations.Count; i++)
+            {
+                if (!EqualityComparer<TMigrationInfo>.Default.Equals(AppliedMigrations[i], other.AppliedMigrations![i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the specified object is a migration summary and equal to this instance.
+        /// This is true when the migration error and all applied migrations are equal.
+        /// </summary>
+        public override bool Equals(object obj) =>
+            obj is MigrationSummary<TMigrationInfo> summary && Equals(summary);
+
+        /// <summary>
+        /// Gets the hash code for this migration summary.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            if (AppliedMigrations.IsNullOrEmpty())
+                return MigrationError?.GetHashCode() ?? 0;
+
+            var builder = MultiplyAddHashBuilder.Create();
+            builder.CombineIntoHash(MigrationError);
+
+            for (var i = 0; i < AppliedMigrations.Count; i++)
+            {
+                builder.CombineIntoHash(AppliedMigrations[i]);
+            }
+
+            return builder.BuildHash();
+        }
+
+        /// <summary>
+        /// Returns the string representation of this migration summary.
+        /// </summary>
+        public override string ToString()
+        {
+            if (MigrationError != null)
+                return "Error occurred at migration " + MigrationError.MigrationWithError;
+
+            if (!AppliedMigrations.IsNullOrEmpty())
+                return "Migrations applied";
+
+            return "No migrations applied";
+        }
     }
 }

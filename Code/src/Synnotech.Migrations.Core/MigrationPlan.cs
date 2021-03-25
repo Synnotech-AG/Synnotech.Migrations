@@ -6,7 +6,7 @@ using Light.GuardClauses.FrameworkExtensions;
 namespace Synnotech.Migrations.Core
 {
     /// <summary>
-    /// Represents a plan about the migrations that the engine will apply.
+    /// Represents a plan that contains the current version of the target system and the pending migrations that need to be applied to it.
     /// </summary>
     /// <typeparam name="TMigration">The type that represents the general abstraction for migrations.</typeparam>
     /// <typeparam name="TMigrationInfo">
@@ -17,13 +17,13 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Initializes a new instance of <see cref="MigrationPlan{TMigration, TMigrationInfo}" />.
         /// </summary>
-        /// <param name="currentVersion">The version that is currently applied to the target database.</param>
-        /// <param name="migrationsToBeApplied">The list of migrations that will be applied by the engine.</param>
+        /// <param name="currentVersion">The version that is currently applied to the target system.</param>
+        /// <param name="pendingMigrations">The list of migrations that need to be applied to the target system.</param>
         public MigrationPlan(TMigrationInfo? currentVersion,
-                             List<TMigration>? migrationsToBeApplied)
+                             List<TMigration>? pendingMigrations)
         {
             CurrentVersion = currentVersion;
-            MigrationsToBeApplied = migrationsToBeApplied;
+            PendingMigrations = pendingMigrations;
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Gets the list of migrations that will be applied by the engine.
         /// </summary>
-        public List<TMigration>? MigrationsToBeApplied { get; }
+        public List<TMigration>? PendingMigrations { get; }
 
         /// <summary>
         /// Gets the value indicating whether there are pending migrations.
         /// </summary>
-        public bool HasPendingMigrations => !MigrationsToBeApplied.IsNullOrEmpty();
+        public bool HasPendingMigrations => !PendingMigrations.IsNullOrEmpty();
 
         /// <summary>
         /// Checks if the other migration plan is equal to this instance. For this to be true, the current version as well
@@ -49,12 +49,12 @@ namespace Synnotech.Migrations.Core
         {
             if (!EqualityComparer<TMigrationInfo?>.Default.Equals(CurrentVersion, other.CurrentVersion))
                 return false;
-            if (MigrationsToBeApplied?.Count != other.MigrationsToBeApplied?.Count || MigrationsToBeApplied.IsNullOrEmpty())
+            if (PendingMigrations?.Count != other.PendingMigrations?.Count || PendingMigrations.IsNullOrEmpty())
                 return false;
 
-            for (var i = 0; i < MigrationsToBeApplied.Count; i++)
+            for (var i = 0; i < PendingMigrations.Count; i++)
             {
-                if (!EqualityComparer<TMigration>.Default.Equals(MigrationsToBeApplied[i], other.MigrationsToBeApplied![i]))
+                if (!EqualityComparer<TMigration>.Default.Equals(PendingMigrations[i], other.PendingMigrations![i]))
                     return false;
             }
 
@@ -73,18 +73,23 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         public override int GetHashCode()
         {
-            if (MigrationsToBeApplied.IsNullOrEmpty())
+            if (PendingMigrations.IsNullOrEmpty())
                 return CurrentVersion?.GetHashCode() ?? 0;
 
             var builder = MultiplyAddHashBuilder.Create();
             builder.CombineIntoHash(CurrentVersion);
 
-            for (var i = 0; i < MigrationsToBeApplied.Count; i++)
+            for (var i = 0; i < PendingMigrations.Count; i++)
             {
-                builder.CombineIntoHash(MigrationsToBeApplied[i]);
+                builder.CombineIntoHash(PendingMigrations[i]);
             }
 
             return builder.BuildHash();
         }
+
+        /// <summary>
+        /// Returns the string representation of this migration plan.
+        /// </summary>
+        public override string ToString() => HasPendingMigrations ? "Pending migrations" : "No pending migrations";
     }
 }

@@ -94,7 +94,7 @@ namespace Synnotech.Migrations.Core
         public virtual async Task<MigrationSummary<TMigrationInfo>> MigrateAsync(Assembly migrationAssembly, DateTime now)
         {
             var migrationPlan = await GenerateMigrationPlanAsync(migrationAssembly);
-            return await ApplyMigrationsAsync(migrationPlan.MigrationsToBeApplied, now);
+            return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
         }
 
         /// <summary>

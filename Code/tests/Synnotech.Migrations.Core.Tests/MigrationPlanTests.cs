@@ -6,6 +6,32 @@ namespace Synnotech.Migrations.Core.Tests
 {
     public static class MigrationPlanTests
     {
+        [Fact]
+        public static void HasPendingMigrations()
+        {
+            var plan = new MigrationPlan<int, int?>(null, new List<int> { 1 });
+
+            plan.HasPendingMigrations.Should().BeTrue();
+        }
+
+        [Fact]
+        public static void HasNoPendingMigrations()
+        {
+            var plan = new MigrationPlan<int, string?>(null, null);
+
+            plan.HasPendingMigrations.Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineData(new[] { 1 }, "Pending migrations")]
+        [InlineData(new int[] { }, "No pending migrations")]
+        public static void StringRepresentation(int[] migrations, string expectedText)
+        {
+            var plan = new MigrationPlan<int, int?>(null, new List<int>(migrations));
+
+            plan.ToString().Should().Be(expectedText);
+        }
+
         [Theory]
         [InlineData(1, new[] { 2, 3, 4 })]
         [InlineData(null, new[] { 1, 2 })]

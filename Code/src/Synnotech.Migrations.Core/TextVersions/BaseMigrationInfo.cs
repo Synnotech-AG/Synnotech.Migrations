@@ -98,5 +98,17 @@ namespace Synnotech.Migrations.Core.TextVersions
             var version = Version!;
             return _name == null ? version : version + " " + _name;
         }
+
+        /// <summary>
+        /// Checks if the specified object is a migration info and if the version is the same.
+        /// </summary>
+        public override bool Equals(object obj) =>
+            obj is BaseMigrationInfo migrationInfo && _version == migrationInfo._version;
+
+        /// <summary>
+        /// Gets the hash code for this migration info.
+        /// </summary>
+        // ReSharper disable once NonReadonlyMemberInGetHashCode -- _version cannot be readonly as this DTO might be used by ORMs / serializers that do not support constructor injection
+        public override int GetHashCode() => _version?.GetHashCode() ?? 0;
     }
 }
