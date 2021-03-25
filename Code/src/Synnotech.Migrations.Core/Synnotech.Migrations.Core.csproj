@@ -2,7 +2,6 @@
 
 	<!-- Please have a look at the Directory.Build.props files to see which properties are set additionally accross different projects -->
 	<PropertyGroup>
-		<TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
 		<DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
 	</PropertyGroup>
 </Project>
