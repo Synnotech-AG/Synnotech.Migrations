@@ -5,6 +5,7 @@ appsettings.*.json
 testsettings.*.json
 .vs/
 .vscode/
+.idea/
 Deployment/
 *.user
 *nupkg
