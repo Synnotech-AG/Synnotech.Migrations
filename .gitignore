@@ -9,3 +9,4 @@ testsettings.*.json
 Deployment/
 *.user
 *nupkg
+*.snk
