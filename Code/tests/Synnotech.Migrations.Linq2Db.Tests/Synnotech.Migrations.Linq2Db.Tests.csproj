@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Synnotech.Migrations.Linq2Db\Synnotech.Migrations.Linq2Db.csproj" />
+    </ItemGroup>
+</Project>

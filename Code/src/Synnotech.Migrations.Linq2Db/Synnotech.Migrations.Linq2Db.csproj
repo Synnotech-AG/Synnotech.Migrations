@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+    <ItemGroup>
+		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
+        <PackageReference Include="linq2db" Version="3.3.0" />
+	</ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\Synnotech.Migrations.Core\Light.GuardClauses\Light.GuardClauses.cs" Link="Light.GuardClauses\Light.GuardClauses.cs" />
+    </ItemGroup>
+</Project>
