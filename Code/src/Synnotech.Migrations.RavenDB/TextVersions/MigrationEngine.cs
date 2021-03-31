@@ -13,7 +13,7 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// Initializes a new instance of <see cref="MigrationEngine" />.
         /// </summary>
         /// <param name="sessionFactory">The factory that creates new session instances.</param>
-        /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="sessionFactory"/> is null.</exception>
         public MigrationEngine(IAsyncSessionFactory<MigrationSession, Migration> sessionFactory)
             : base(sessionFactory, new AttributeMigrationsProvider<Migration, MigrationInfo>(), MigrationInfo.Create) { }
     }
