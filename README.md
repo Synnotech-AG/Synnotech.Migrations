@@ -2,6 +2,8 @@
 
 *A lightweight generic migration engine for .NET*
 
+[![Synnotech Logo](synnotech-large-logo.png)](https://www.synnotech.de/)
+
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/Synnotech-AG/Synnotech.Migrations/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/badge/NuGet-0.6.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages?q=Synnotech.Migrations)
 
