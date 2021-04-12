@@ -16,6 +16,5 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="sessionFactory"/> is null.</exception>
         public MigrationEngine(IAsyncSessionFactory<MigrationSession, Migration> sessionFactory)
             : base(sessionFactory, new AttributeMigrationsProvider<Migration, MigrationInfo>(), MigrationInfo.Create) { }
-
     }
 }

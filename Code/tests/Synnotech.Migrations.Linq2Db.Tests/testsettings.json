@@ -1,0 +1,6 @@
+﻿{
+    // See TestSettings.cs for details. Please do not change this file. You can create a separate testsettings.Development.json file
+    // to overwrite the settings in this file.
+    "runDatabaseIntegrationTests": "false",
+    "connectionString": "Server=(localdb)\\msssqllocaldb;Database=SynnotechMigrationsLinq2DbTests;Integrated Security=True"
+}

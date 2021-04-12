@@ -14,7 +14,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the point in time when the migration was applied.
+        /// Gets or sets the point in time when the migration was applied. Please use a UTC timestamp if possible.
         /// </summary>
         public DateTime AppliedAt { get; set; }
 

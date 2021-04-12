@@ -4,4 +4,7 @@
 	<PropertyGroup>
 		<DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\Light.GuardClauses.cs" Link="Light.GuardClauses.cs" />
+	</ItemGroup>
 </Project>

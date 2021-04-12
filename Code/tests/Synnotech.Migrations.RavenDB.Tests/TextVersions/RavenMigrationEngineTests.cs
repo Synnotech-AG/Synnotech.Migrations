@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
 {
-    public sealed class AsyncRavenMigrationEngineTests : RavenDbIntegrationTest
+    public sealed class RavenMigrationEngineTests : RavenDbIntegrationTest
     {
         [SkippableFact]
         public async Task MigrateAll()
@@ -22,7 +22,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             using var store = GetDocumentStore();
             var engine = new MigrationEngine(new SessionFactory(store));
 
-            var summary = await engine.MigrateAsync(typeof(AsyncRavenMigrationEngineTests).Assembly, now);
+            var summary = await engine.MigrateAsync(typeof(RavenMigrationEngineTests).Assembly, now);
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
             var expectedMigrationInfos = new List<MigrationInfo>
@@ -56,7 +56,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             await session.StoreAsync(new MigrationInfo { Id = "migrationInfos/1.0.0", Name = nameof(FirstMigration), Version = "1.0.0", AppliedAt = now.AddDays(-1) });
             await session.SaveChangesAsync();
 
-            var summary = await engine.MigrateAsync(typeof(AsyncRavenMigrationEngineTests).Assembly, now);
+            var summary = await engine.MigrateAsync(typeof(RavenMigrationEngineTests).Assembly, now);
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
             var expectedMigrationInfo = new MigrationInfo { Id = "migrationInfos/2.0.0", Name = nameof(SecondMigration), Version = "2.0.0", AppliedAt = now };
@@ -82,7 +82,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             await session.StoreAsync(new MigrationInfo { Id = "migrationInfos/2.0.0", Name = nameof(FirstMigration), Version = "2.0.0", AppliedAt = now.AddDays(-5) });
             await session.SaveChangesAsync();
 
-            var summary = await engine.MigrateAsync(typeof(AsyncRavenMigrationEngineTests).Assembly, now);
+            var summary = await engine.MigrateAsync(typeof(RavenMigrationEngineTests).Assembly, now);
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
             appliedMigrations.Should().BeNullOrEmpty();
@@ -101,7 +101,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
                                                   .AddSynnotechMigrations();
 
             var migrationEngine = services.BuildServiceProvider().GetRequiredService<MigrationEngine>();
-            var migrationPlan = await migrationEngine.GenerateMigrationPlanAsync(typeof(AsyncRavenMigrationEngineTests).Assembly);
+            var migrationPlan = await migrationEngine.GenerateMigrationPlanAsync(typeof(RavenMigrationEngineTests).Assembly);
 
             var expectedPlan = new MigrationPlan<Migration, MigrationInfo>(null, new List<Migration> { new FirstMigration(), new SecondMigration() });
             migrationPlan.Should().Be(expectedPlan);

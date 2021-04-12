@@ -1,5 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <ProjectReference Include="..\..\src\Synnotech.Migrations.Linq2Db\Synnotech.Migrations.Linq2Db.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="testsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <Compile Include="..\AssemblyInfos.cs">
+            <Link>AssemblyInfos.cs</Link>
+        </Compile>
+        <Compile Include="..\TestSettings.cs" Link="TestSettings.cs" />
     </ItemGroup>
 </Project>
