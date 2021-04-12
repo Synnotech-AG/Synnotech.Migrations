@@ -13,7 +13,7 @@ namespace Synnotech.Migrations.Core
     /// occurred during the migration.
     /// </summary>
     /// <typeparam name="TContext">The type that represents the context for database interactions.</typeparam>
-    public interface IAsyncMigration<in TContext>
+    public interface IMigration<in TContext>
     {
         /// <summary>
         /// Executes the migration. Interactions with the target system can be performed

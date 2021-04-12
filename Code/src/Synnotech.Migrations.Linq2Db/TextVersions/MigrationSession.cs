@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
@@ -20,10 +19,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Initializes a new instance of <see cref="MigrationSession{TDataConnection}" />.
         /// </summary>
         /// <param name="dataConnection">The Linq2Db data connection used to access the target database.</param>
-        /// <param name="transactionLevel">The transaction level. If null is specified, no transaction will be created.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
-        public MigrationSession(TDataConnection dataConnection, IsolationLevel? transactionLevel)
-            : base(dataConnection, transactionLevel) { }
+        public MigrationSession(TDataConnection dataConnection) : base(dataConnection) { }
 
         /// <summary>
         /// Gets the latest migration info from the target database. This method
@@ -56,9 +53,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Initializes a new instance of <see cref="MigrationSession" />.
         /// </summary>
         /// <param name="dataConnection">The Linq2Db data connection used to access the target database.</param>
-        /// <param name="transactionLevel">The transaction level. If null is specified, no transaction will be created.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
-        public MigrationSession(DataConnection dataConnection, IsolationLevel? transactionLevel)
-            : base(dataConnection, transactionLevel) { }
+        public MigrationSession(DataConnection dataConnection) : base(dataConnection) { }
     }
 }

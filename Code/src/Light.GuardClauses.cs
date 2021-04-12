@@ -5105,6 +5105,7 @@ namespace JetBrains.Annotations
     }
 }
 
+#if NETSTANDARD2_0
 namespace System.Diagnostics.CodeAnalysis
 {
     /// <summary>
@@ -5302,3 +5303,4 @@ namespace System.Diagnostics.CodeAnalysis
         }
     }
 }
+#endif

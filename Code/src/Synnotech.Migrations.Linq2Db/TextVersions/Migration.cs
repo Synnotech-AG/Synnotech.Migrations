@@ -10,7 +10,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     /// uses <see cref="System.Version" /> to identify and sort migrations. As the context type,
     /// <see cref="MigrationSession"/> is used.
     /// </summary>
-    public abstract class Migration : BaseMigration<Migration>, IAsyncMigration<MigrationSession>
+    public abstract class Migration : BaseMigration<Migration>, IMigration<MigrationSession>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="Migration" />.

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data;
+using System.Threading.Tasks;
 using Light.GuardClauses;
 using LinqToDB.Data;
 using Synnotech.Migrations.Core;
@@ -7,9 +7,9 @@ using Synnotech.Migrations.Core;
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
-    /// Represents the default factory for creating migration sessions.
+    /// Represents the default factory for creating Linq2Db migration sessions that support text versions.
     /// </summary>
-    public sealed class SessionFactory : IAsyncSessionFactory<MigrationSession, Migration>
+    public sealed class SessionFactory : ISessionFactory<MigrationSession, Migration>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="SessionFactory"/>.
@@ -27,19 +27,22 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// </summary>
         /// <param name="migration">The migration the session is created for.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
-        public MigrationSession CreateSessionForMigration(Migration migration)
+        public async ValueTask<MigrationSession> CreateSessionForMigrationAsync(Migration migration)
         {
             migration.MustNotBeNull(nameof(migration));
-
-            IsolationLevel? transactionLevel = null;
+            var session = new MigrationSession(CreateDataConnection());
             if (migration.IsRequiringTransaction)
-                transactionLevel = IsolationLevel.Serializable;
-            return new(CreateDataConnection(), transactionLevel);
+                await session.BeginTransactionAsync();
+            return session;
         }
 
         /// <summary>
         /// Creates a new session without a transaction.
         /// </summary>
-        public MigrationSession CreateSessionForRetrievingLatestMigrationInfo() => new(CreateDataConnection(), null);
+        public ValueTask<MigrationSession> CreateSessionForRetrievingLatestMigrationInfoAsync()
+        {
+            var session = new MigrationSession(CreateDataConnection());
+            return new (session);
+        }
     }
 }

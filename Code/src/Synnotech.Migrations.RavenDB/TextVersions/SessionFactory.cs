@@ -1,12 +1,13 @@
-﻿using Raven.Client.Documents;
+﻿using System.Threading.Tasks;
+using Raven.Client.Documents;
 using Synnotech.Migrations.Core;
 
 namespace Synnotech.Migrations.RavenDB.TextVersions
 {
     /// <summary>
-    /// Represents the default factory for async migration sessions.
+    /// Represents the default factory for RavenDB migration sessions with text versions.
     /// </summary>
-    public sealed class SessionFactory : IAsyncSessionFactory<MigrationSession, Migration>
+    public sealed class SessionFactory : ISessionFactory<MigrationSession, Migration>
     {
         private readonly IDocumentStore _store;
 
@@ -19,14 +20,13 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// <summary>
         /// Creates a new <see cref="MigrationSession" /> instance using a new session from the underlying <see cref="IDocumentStore" />.
         /// </summary>
-        public MigrationSession CreateSessionForMigration(Migration migration) => CreateSession();
+        public ValueTask<MigrationSession> CreateSessionForMigrationAsync(Migration migration) => CreateSession();
         
         /// <summary>
         /// Creates a new <see cref="MigrationSession" /> instance using a new session from the underlying <see cref="IDocumentStore" />.
         /// </summary>
-        public MigrationSession CreateSessionForRetrievingLatestMigrationInfo() => CreateSession();
+        public ValueTask<MigrationSession> CreateSessionForRetrievingLatestMigrationInfoAsync() => CreateSession();
         
-
-        private MigrationSession CreateSession() => new(_store.OpenAsyncSession());
+        private ValueTask<MigrationSession> CreateSession() => new (new MigrationSession(_store.OpenAsyncSession()));
     }
 }

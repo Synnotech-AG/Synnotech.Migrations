@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Synnotech.DatabaseAbstractions;
 
 namespace Synnotech.Migrations.Core
 {
@@ -12,7 +13,7 @@ namespace Synnotech.Migrations.Core
     /// simply load the latest migration info to determine if there are any migrations
     /// that need to be applied to the target system.
     /// </typeparam>
-    public interface IAsyncMigrationSession<TMigrationInfo> : IAsyncSession
+    public interface IMigrationSession<TMigrationInfo> : IAsyncSession
     {
         /// <summary>
         /// Gets the metadata about the latest applied migration (i.e. the MigrationInfo with the highest version)

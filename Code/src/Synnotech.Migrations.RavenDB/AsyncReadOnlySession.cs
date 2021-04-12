@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Light.GuardClauses;
 using Raven.Client.Documents.Session;
 
@@ -10,7 +11,7 @@ namespace Synnotech.Migrations.RavenDB
     /// IMPORTANT: you cannot derive from this class and introduce
     /// new disposable references as <see cref="Dispose"/> is not virtual!
     /// </summary>
-    public abstract class AsyncReadOnlySession : IDisposable
+    public abstract class AsyncReadOnlySession : IDisposable, IAsyncDisposable
     {
         /// <summary>
         /// Initializes a new instance of <see cref="AsyncReadOnlySession"/>.
@@ -28,5 +29,14 @@ namespace Synnotech.Migrations.RavenDB
         /// Disposes the underlying <see cref="IAsyncDocumentSession"/>.
         /// </summary>
         public void Dispose() => Session.Dispose();
+
+        /// <summary>
+        /// Disposes the underlying <see cref="IAsyncDocumentSession"/>.
+        /// </summary>
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return new ValueTask(Task.CompletedTask);
+        }
     }
 }

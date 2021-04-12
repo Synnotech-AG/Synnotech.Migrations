@@ -13,7 +13,7 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
     /// your migrations need for execution.
     /// IMPORTANT: you should not call SaveChangesAsync in your migrations, as this is done by the migration engine.
     /// </summary>
-    public class MigrationSession<TMigrationInfo> : AsyncSession, IAsyncMigrationSession<TMigrationInfo>
+    public class MigrationSession<TMigrationInfo> : AsyncSession, IMigrationSession<TMigrationInfo>
         where TMigrationInfo : BaseMigrationInfo
     {
         /// <summary>
@@ -23,14 +23,14 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// <param name="waitForIndexesAfterSaveChanges">The value indicating whether the RavenDB client waits for all indexes to be updated during a <see cref="AsyncSession.SaveChangesAsync" /> call.</param>
         public MigrationSession(IAsyncDocumentSession session, bool waitForIndexesAfterSaveChanges = true) : base(session, waitForIndexesAfterSaveChanges) { }
 
-        Task<TMigrationInfo?> IAsyncMigrationSession<TMigrationInfo>.GetLatestMigrationInfoAsync() =>
+        Task<TMigrationInfo?> IMigrationSession<TMigrationInfo>.GetLatestMigrationInfoAsync() =>
 #nullable disable
             Session.Query<TMigrationInfo>()
                    .OrderByDescending(migrationInfo => migrationInfo!.Version)
                    .FirstOrDefaultAsync();
 #nullable restore
 
-        Task IAsyncMigrationSession<TMigrationInfo>.StoreMigrationInfoAsync(TMigrationInfo migrationInfo) =>
+        Task IMigrationSession<TMigrationInfo>.StoreMigrationInfoAsync(TMigrationInfo migrationInfo) =>
             Session.StoreAsync(migrationInfo, "migrationInfos" + Session.Advanced.DocumentStore.Conventions.IdentityPartsSeparator + migrationInfo.Version);
 
         /// <summary>

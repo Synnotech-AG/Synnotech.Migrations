@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
-using Synnotech.Migrations.Core;
+using Synnotech.DatabaseAbstractions;
 
 namespace Synnotech.Migrations.RavenDB
 {
