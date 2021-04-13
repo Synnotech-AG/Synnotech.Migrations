@@ -3,7 +3,7 @@ using Raven.TestDriver;
 using Xunit;
 
 // ReSharper disable once CheckNamespace -- this class should be partial with the imported class
-namespace Synnotech.Migrations
+namespace Synnotech
 {
     public static partial class TestSettings
     {

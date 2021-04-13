@@ -96,7 +96,6 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         {
             TestSettings.SkipDatabaseIntegrationTestIfNecessary();
 
-            var now = DateTime.UtcNow;
             var services = new ServiceCollection().AddSingleton(GetDocumentStore())
                                                   .AddSynnotechMigrations();
 

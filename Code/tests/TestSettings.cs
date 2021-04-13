@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace Synnotech.Migrations
+namespace Synnotech
 {
     public static partial class TestSettings
     {

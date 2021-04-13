@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Synnotech.Migrations.RavenDB\Synnotech.Migrations.RavenDB.csproj" />
-        <PackageReference Include="RavenDB.TestDriver" Version="5.1.5" />
+        <ProjectReference Include="..\..\src\Synnotech.SqlServer\Synnotech.SqlServer.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">
