@@ -10,7 +10,6 @@
         <None Update="testsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <Compile Include="..\TestSettings.cs" Link="TestSettings.cs" />
         <Compile Include="..\AssemblyInfos.cs" Link="AssemblyInfos.cs" />
     </ItemGroup>
 </Project>

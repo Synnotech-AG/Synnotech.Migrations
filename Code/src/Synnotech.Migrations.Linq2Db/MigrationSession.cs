@@ -25,10 +25,8 @@ namespace Synnotech.Migrations.Linq2Db
         /// </summary>
         /// <param name="dataConnection">The Linq2Db data connection used to access the target database.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
-        protected MigrationSession(TDataConnection dataConnection)
-        {
+        protected MigrationSession(TDataConnection dataConnection) =>
             DataConnection = dataConnection.MustNotBeNull(nameof(dataConnection));
-        }
 
         /// <summary>
         /// Gets the Linq2Db data connection that allows access to the target database.

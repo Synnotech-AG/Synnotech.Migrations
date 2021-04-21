@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Synnotech.SqlServer\Synnotech.SqlServer.csproj" />
+        <ProjectReference Include="..\..\src\Synnotech.Xunit\Synnotech.Xunit.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">

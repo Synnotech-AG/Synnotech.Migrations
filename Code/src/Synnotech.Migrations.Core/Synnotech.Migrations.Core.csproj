@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <!-- Please have a look at the Directory.Build.props files to see which properties are set additionally accross different projects -->
-    <PropertyGroup>
-        <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\Synnotech.DatabaseAbstractions\Synnotech.DatabaseAbstractions.csproj" />
-        <Compile Include="..\Light.GuardClauses.cs" Link="Light.GuardClauses.cs" />
-    </ItemGroup>
+	<!-- Please have a look at the Directory.Build.props files to see which properties are set additionally accross different projects -->
+	<PropertyGroup>
+		<DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Synnotech.DatabaseAbstractions" Version="1.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\Light.GuardClauses.cs" Link="Light.GuardClauses.cs" />
+	</ItemGroup>
 </Project>

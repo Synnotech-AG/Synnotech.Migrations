@@ -16,7 +16,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         [SkippableFact]
         public async Task MigrateAll()
         {
-            TestSettings.SkipDatabaseIntegrationTestIfNecessary();
+            TestSettings.SkipTestIfNecessary();
 
             var now = DateTime.UtcNow;
             using var store = GetDocumentStore();
@@ -28,7 +28,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             var expectedMigrationInfos = new List<MigrationInfo>
             {
                 new() { Id = "migrationInfos/1.0.0", Name = nameof(FirstMigration), Version = "1.0.0", AppliedAt = now },
-                new() { Id = "migrationInfos/2.0.0", Name = nameof(SecondMigration), Version = "2.0.0", AppliedAt = now },
+                new() { Id = "migrationInfos/2.0.0", Name = nameof(SecondMigration), Version = "2.0.0", AppliedAt = now }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos, config => config.WithStrictOrdering());
             using var session = store.OpenAsyncSession();
@@ -46,7 +46,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         [SkippableFact]
         public async Task MigrateNewest()
         {
-            TestSettings.SkipDatabaseIntegrationTestIfNecessary();
+            TestSettings.SkipTestIfNecessary();
 
             var now = DateTime.UtcNow;
             using var store = GetDocumentStore();
@@ -72,7 +72,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         [SkippableFact]
         public async Task AllMigrationsApplied()
         {
-            TestSettings.SkipDatabaseIntegrationTestIfNecessary();
+            TestSettings.SkipTestIfNecessary();
 
             var now = DateTime.UtcNow;
             using var store = GetDocumentStore();
@@ -94,7 +94,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         [SkippableFact]
         public async Task GetMigrationPlan()
         {
-            TestSettings.SkipDatabaseIntegrationTestIfNecessary();
+            TestSettings.SkipTestIfNecessary();
 
             var services = new ServiceCollection().AddSingleton(GetDocumentStore())
                                                   .AddSynnotechMigrations();
