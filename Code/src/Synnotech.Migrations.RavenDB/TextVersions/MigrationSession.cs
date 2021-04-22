@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 using Synnotech.DatabaseAbstractions;
 using Synnotech.Migrations.Core;
@@ -32,12 +32,26 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
                 Session.Advanced.WaitForIndexesAfterSaveChanges();
         }
 
-        Task<TMigrationInfo?> IMigrationSession<TMigrationInfo>.GetLatestMigrationInfoAsync() =>
+        async Task<TMigrationInfo?> IMigrationSession<TMigrationInfo>.GetLatestMigrationInfoAsync()
+        {
 #nullable disable
-            Session.Query<TMigrationInfo>()
-                   .OrderByDescending(migrationInfo => migrationInfo.Version)
-                   .FirstOrDefaultAsync();
+            var migrationInfos = await Session.Query<TMigrationInfo>()
+                                              .ToListAsync();
+            if (migrationInfos.IsNullOrEmpty())
+                return null;
+
+            var sortedInfos = new SortedList<Version, TMigrationInfo>(migrationInfos.Count);
+            for (var i = 0; i < migrationInfos.Count; i++)
+            {
+                var migrationInfo = migrationInfos[i];
+                if (migrationInfo.TryGetInternalVersion(out var version))
+                    sortedInfos.Add(version, migrationInfo);
+            }
+
+            var lastKey = sortedInfos.Keys[sortedInfos.Keys.Count - 1];
+            return sortedInfos[lastKey];
 #nullable restore
+        }
 
         Task IMigrationSession<TMigrationInfo>.StoreMigrationInfoAsync(TMigrationInfo migrationInfo) =>
             Session.StoreAsync(migrationInfo, "migrationInfos" + Session.Advanced.DocumentStore.Conventions.IdentityPartsSeparator + migrationInfo.Version);
