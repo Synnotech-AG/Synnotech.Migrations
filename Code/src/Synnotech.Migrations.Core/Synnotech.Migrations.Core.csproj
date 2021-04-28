@@ -3,6 +3,14 @@
 	<!-- Please have a look at the Directory.Build.props files to see which properties are set additionally accross different projects -->
 	<PropertyGroup>
 		<DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
+		<Description>Core implementation of a generic migration engine that can be adapted to any target system.</Description>
+		<PackageReleaseNotes>
+Synntech.Migrations.Core 0.7.0
+--------------------------------
+
+- `BaseMigrationInfo` now also has the `AppliedAt` property and an additional method to determine the latest migration info from a list
+- you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
+		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Synnotech.DatabaseAbstractions" Version="1.1.1" />
