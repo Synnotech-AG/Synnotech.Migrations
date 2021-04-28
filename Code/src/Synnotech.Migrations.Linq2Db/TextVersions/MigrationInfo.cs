@@ -14,16 +14,11 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the point in time when the migration was applied. Please use a UTC timestamp if possible.
-        /// </summary>
-        public DateTime AppliedAt { get; set; }
-
-        /// <summary>
-        /// Represents the default factory method that is used to instantiate a new <see cref="MigrationInfo"/>.
+        /// Represents the default factory method that is used to instantiate a new <see cref="MigrationInfo" />.
         /// </summary>
         /// <param name="migration">The migration that was executed.</param>
         /// <param name="appliedAt">The point in time when the migration was applied. Use <see cref="DateTime.UtcNow" /> if possible.</param>
         public static MigrationInfo Create(Migration migration, DateTime appliedAt) =>
-            new() { Version = migration.VersionString, Name = migration.Name, AppliedAt = appliedAt };
+            new () { Version = migration.VersionString, Name = migration.Name, AppliedAt = appliedAt };
     }
 }

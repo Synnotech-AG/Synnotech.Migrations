@@ -29,7 +29,15 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// </summary>
         public bool IsRequiringTransaction { get; protected set; } = true;
 
-        /// <inheritdoc />
-        public abstract Task ApplyAsync(MigrationSession context);
+        /// <summary>
+        /// Executes the migration. Interactions with the target system can be performed
+        /// using the specified session.
+        /// IMPORTANT: you usually should not call 'context.SaveChangesAsync' or something
+        /// similar as this is handled by the migration engine.
+        /// You can set <see cref="IsRequiringTransaction"/> to false to handle transactions yourself
+        /// or execute the migration without a transaction.
+        /// </summary>
+        /// <param name="session">The object that is used to interact with the target database.</param>
+        public abstract Task ApplyAsync(MigrationSession session);
     }
 }

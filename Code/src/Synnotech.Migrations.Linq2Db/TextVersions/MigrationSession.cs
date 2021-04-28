@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
 using LinqToDB.Data;
+using Synnotech.Migrations.Core.TextVersions;
 
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
@@ -11,7 +12,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     /// via a Linq2Db data connection. You can derive from this type and add all other dependencies that
     /// your migrations need for execution.
     /// </summary>
-    /// <typeparam name="TDataConnection">Your database context type that derives from <see cref="DataConnection"/>.</typeparam>
+    /// <typeparam name="TDataConnection">Your database context type that derives from <see cref="DataConnection" />.</typeparam>
     public class MigrationSession<TDataConnection> : MigrationSession<TDataConnection, MigrationInfo>
         where TDataConnection : DataConnection
     {
@@ -19,7 +20,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Initializes a new instance of <see cref="MigrationSession{TDataConnection}" />.
         /// </summary>
         /// <param name="dataConnection">The Linq2Db data connection used to access the target database.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public MigrationSession(TDataConnection dataConnection) : base(dataConnection) { }
 
         /// <summary>
@@ -31,9 +32,11 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         {
             try
             {
-                return await DataConnection.GetTable<MigrationInfo>()
-                                           .OrderByDescending(info => info.Id)
-                                           .FirstOrDefaultAsync();
+                var migrationInfos = await DataConnection.GetTable<MigrationInfo>()
+                                                         .OrderByDescending(migrationInfo => migrationInfo.AppliedAt)
+                                                         .Take(100)
+                                                         .ToListAsync();
+                return migrationInfos.GetLatestMigrationInfo();
             }
             catch
             {
@@ -53,7 +56,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Initializes a new instance of <see cref="MigrationSession" />.
         /// </summary>
         /// <param name="dataConnection">The Linq2Db data connection used to access the target database.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public MigrationSession(DataConnection dataConnection) : base(dataConnection) { }
     }
 }

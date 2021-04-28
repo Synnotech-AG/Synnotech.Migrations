@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Light.GuardClauses;
+using Range = Light.GuardClauses.Range;
 
 namespace Synnotech.Migrations.Core.TextVersions
 {
