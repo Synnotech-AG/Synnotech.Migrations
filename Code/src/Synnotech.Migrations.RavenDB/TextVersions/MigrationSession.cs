@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using Raven.Client.Documents;
@@ -34,23 +34,11 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
 
         async Task<TMigrationInfo?> IMigrationSession<TMigrationInfo>.GetLatestMigrationInfoAsync()
         {
-#nullable disable
             var migrationInfos = await Session.Query<TMigrationInfo>()
+                                              .OrderByDescending(migrationInfo => migrationInfo.AppliedAt)
+                                              .Take(100)
                                               .ToListAsync();
-            if (migrationInfos.IsNullOrEmpty())
-                return null;
-
-            var sortedInfos = new SortedList<Version, TMigrationInfo>(migrationInfos.Count);
-            for (var i = 0; i < migrationInfos.Count; i++)
-            {
-                var migrationInfo = migrationInfos[i];
-                if (migrationInfo.TryGetInternalVersion(out var version))
-                    sortedInfos.Add(version, migrationInfo);
-            }
-
-            var lastKey = sortedInfos.Keys[sortedInfos.Keys.Count - 1];
-            return sortedInfos[lastKey];
-#nullable restore
+            return migrationInfos.GetLatestMigrationInfo();
         }
 
         Task IMigrationSession<TMigrationInfo>.StoreMigrationInfoAsync(TMigrationInfo migrationInfo) =>

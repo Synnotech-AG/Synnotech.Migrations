@@ -14,12 +14,6 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         public string? Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the point in time when the migration was applied.
-        /// Please use a UTC time stamp if possible.
-        /// </summary>
-        public DateTime AppliedAt { get; set; }
-
-        /// <summary>
         /// Represents the default factory method that is used to instantiate a new <see cref="MigrationInfo" />.
         /// </summary>
         /// <param name="migration">The migration that was executed.</param>
