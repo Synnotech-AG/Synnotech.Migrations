@@ -1,11 +1,8 @@
 ﻿using Light.GuardClauses;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
-using Synnotech.Migrations.RavenDB.TextVersions;
+using Synnotech.Migrations.Linq2Db.TextVersions;
 
-namespace Synnotech.Migrations.RavenDB
+namespace Synnotech.Migrations.Linq2Db
 {
     /// <summary>
     /// Provides methods to register the migration engine with the DI container.
@@ -13,11 +10,11 @@ namespace Synnotech.Migrations.RavenDB
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers the default migration engine for Raven DB with the DI Container.
-        /// If there is no registration for <see cref="IAsyncDocumentSession" />, it will
-        /// be added with a transient lifetime. All other instances (<see cref="MigrationEngine" /> and <see cref="SessionFactory" />)
-        /// will be also be added with a transient lifetime. A registration for <see cref="IDocumentStore" /> must already be present
-        /// (usually with a singleton lifetime).
+        /// Registers the default migration engine for Linq2Db with the DI container.
+        /// This method registers <see cref="MigrationEngine"/> and <see cref="SessionFactory"/>
+        /// with transient lifetimes.
+        /// The session factory requires a Func&lt;DataConnection&gt; to be already registered with the DI container.
+        /// This is used to resolve a data connection when constructing <see cref="MigrationSession"/> instances.
         /// IMPORTANT: you should not call this method when you run a custom setup -
         /// please register your own types with the DI container in this case.
         /// </summary>
@@ -25,7 +22,6 @@ namespace Synnotech.Migrations.RavenDB
         {
             services.MustNotBeNull(nameof(services));
 
-            services.TryAddTransient(container => container.GetRequiredService<IDocumentStore>().OpenAsyncSession());
             return services.AddTransient<SessionFactory>()
                            .AddTransient(container => new MigrationEngine(container.GetRequiredService<SessionFactory>()));
         }

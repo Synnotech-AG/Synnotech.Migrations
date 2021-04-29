@@ -18,10 +18,10 @@ namespace Synnotech.Migrations.Core.TextVersions
         private Version? _version;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="BaseMigrationInfo"/>.
+        /// Initializes a new instance of <see cref="BaseMigrationInfo" />.
         /// </summary>
         /// <param name="fieldCount">The number of components that are returned from the internal version when it is serialized to a string. Default is 3 (semantic version).</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="fieldCount"/> is not in between 1 to 4</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="fieldCount" /> is not in between 1 to 4</exception>
         protected BaseMigrationInfo(int fieldCount = 3)
         {
             _fieldCount = fieldCount.MustBeIn(Range.FromInclusive(1).ToInclusive(4), nameof(fieldCount));
@@ -44,6 +44,12 @@ namespace Synnotech.Migrations.Core.TextVersions
             get => _name;
             set => _name = value.MustNotBeNullOrWhiteSpace();
         }
+
+        /// <summary>
+        /// Gets or sets the date when the migration was applied. We recommend that you
+        /// use UTC time stamps.
+        /// </summary>
+        public DateTime AppliedAt { get; set; }
 
         /// <summary>
         /// Compares this migration info to the version attribute of a migration.
@@ -83,7 +89,7 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// <summary>
         /// Sets the internal version to the specified value.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="version"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="version" /> is null.</exception>
         public void SetInternalVersion(Version version)
         {
             _version = version.MustNotBeNull(nameof(version));

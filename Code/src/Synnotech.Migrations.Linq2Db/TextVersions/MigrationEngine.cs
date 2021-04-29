@@ -2,10 +2,10 @@
 using Synnotech.Migrations.Core;
 using Synnotech.Migrations.Core.TextVersions;
 
-namespace Synnotech.Migrations.RavenDB.TextVersions
+namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
-    /// Represents the default async migration engine for RavenDB.
+    /// Represents the default migration engine for Linq2Db.
     /// </summary>
     public class MigrationEngine : MigrationEngine<MigrationSession, Migration, MigrationInfo>
     {

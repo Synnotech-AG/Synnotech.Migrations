@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Synnotech.Migrations.Core.Tests
 {
-    public sealed class AsyncMigrationEngineTests
+    public sealed class MigrationEngineTests
     {
         private readonly TestContext _context = new();
         private readonly DateTime _utcNow = DateTime.UtcNow;
@@ -61,11 +61,11 @@ namespace Synnotech.Migrations.Core.Tests
         private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync()
         {
             var migrationsProvider = new AttributeMigrationsProvider<TestMigration, TestMigrationInfo>();
-            var engine = new AsyncMigrationEngine<TestContext, TestMigration, TestMigrationInfo>(new TestAsyncSessionFactory(_context), migrationsProvider, _migrationInfoFactory.Create);
-            return engine.MigrateAsync(typeof(AsyncMigrationEngineTests).Assembly, _utcNow);
+            var engine = new MigrationEngine<TestContext, TestMigration, TestMigrationInfo>(new TestSessionFactory(_context), migrationsProvider, _migrationInfoFactory.Create);
+            return engine.MigrateAsync(typeof(MigrationEngineTests).Assembly, _utcNow);
         }
 
-        public abstract class TestMigration : BaseMigration<TestMigration>, IAsyncMigration<TestContext>
+        public abstract class TestMigration : BaseMigration<TestMigration>, IMigration<TestContext>
         {
             public Task ApplyAsync(TestContext context) => Task.CompletedTask;
         }
@@ -85,7 +85,7 @@ namespace Synnotech.Migrations.Core.Tests
             public DateTime AppliedAt { get; set; }
         }
 
-        public sealed class TestContext : IAsyncMigrationSession<TestMigrationInfo>
+        public sealed class TestContext : IMigrationSession<TestMigrationInfo>
         {
             public int DisposeCallCount;
             public TestMigrationInfo? LatestMigrationInfo;
@@ -126,6 +126,12 @@ namespace Synnotech.Migrations.Core.Tests
                 MustBeRolledBack();
                 MustBeDisposed();
             }
+
+            public ValueTask DisposeAsync()
+            {
+                Dispose();
+                return ValueTask.CompletedTask;
+            }
         }
 
         public sealed class TestMigrationInfoFactory
@@ -144,15 +150,15 @@ namespace Synnotech.Migrations.Core.Tests
             }
         }
 
-        public sealed class TestAsyncSessionFactory : IAsyncSessionFactory<TestContext, TestMigration>
+        public sealed class TestSessionFactory : ISessionFactory<TestContext, TestMigration>
         {
             private readonly TestContext _testContext;
 
-            public TestAsyncSessionFactory(TestContext testContext) => _testContext = testContext;
+            public TestSessionFactory(TestContext testContext) => _testContext = testContext;
 
-            public TestContext CreateSessionForRetrievingLatestMigrationInfo() => _testContext;
+            public ValueTask<TestContext> CreateSessionForRetrievingLatestMigrationInfoAsync() => new (_testContext);
 
-            public TestContext CreateSessionForMigration(TestMigration migration) => _testContext;
+            public ValueTask<TestContext> CreateSessionForMigrationAsync(TestMigration migration) => new (_testContext);
         }
     }
 }

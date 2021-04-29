@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for RavenDB</Description>
+		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.RavenDB 0.7.0
+Synntech.Migrations.Linq2Db 0.7.0
 --------------------------------
 
-- changed the way how the latest migration info is obtained by the MigrationSession. It is now determined client-side.
+- initial release 🥳🎈🎉
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
@@ -15,7 +15,8 @@ Synntech.Migrations.RavenDB 0.7.0
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="RavenDB.Client" Version="5.0.0" />
+		<PackageReference Include="linq2db" Version="3.3.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
 	</ItemGroup>
 </Project>

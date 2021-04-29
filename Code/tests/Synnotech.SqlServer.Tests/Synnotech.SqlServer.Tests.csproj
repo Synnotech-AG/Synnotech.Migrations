@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Synnotech.Migrations.RavenDB\Synnotech.Migrations.RavenDB.csproj" />
-        <PackageReference Include="RavenDB.TestDriver" Version="5.1.5" />
+        <ProjectReference Include="..\..\src\Synnotech.Xunit\Synnotech.Xunit.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">
@@ -10,6 +9,7 @@
         <None Update="testsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <Compile Include="..\TestSettings.cs" Link="TestSettings.cs" />
         <Compile Include="..\AssemblyInfos.cs" Link="AssemblyInfos.cs" />
     </ItemGroup>
 </Project>

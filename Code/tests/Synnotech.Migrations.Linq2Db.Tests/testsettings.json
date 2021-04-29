@@ -1,8 +1,7 @@
-{
+﻿{
     // Please do not change this file. You can create a separate testsettings.Development.json file
     // to overwrite the settings in this file.
     "runDatabaseIntegrationTests": false,
-    "ravenDbOptions": {
-        "frameworkVersion": "5.0.5"
-    }
+    "connectionString": "Server=SYN-LAP-KEPFL;Database=SynnotechMigrationsLinq2DbTests;Integrated Security=True",
+    "sqlServerVersion": "v2017"
 }

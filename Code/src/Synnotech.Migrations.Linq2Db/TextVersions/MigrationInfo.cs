@@ -1,17 +1,17 @@
 ﻿using System;
 using Synnotech.Migrations.Core.TextVersions;
 
-namespace Synnotech.Migrations.RavenDB.TextVersions
+namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
-    /// Represents the default migration info for RavenDB.
+    /// Represents the default migration info for Linq2Db.
     /// </summary>
     public class MigrationInfo : BaseMigrationInfo
     {
         /// <summary>
-        /// Gets or sets the document ID of the migration info.
+        /// Gets or sets the Id of the migration info (Primary Key).
         /// </summary>
-        public string? Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Represents the default factory method that is used to instantiate a new <see cref="MigrationInfo" />.
@@ -19,6 +19,6 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// <param name="migration">The migration that was executed.</param>
         /// <param name="appliedAt">The point in time when the migration was applied. Use <see cref="DateTime.UtcNow" /> if possible.</param>
         public static MigrationInfo Create(Migration migration, DateTime appliedAt) =>
-            new() { Version = migration.VersionString, Name = migration.Name, AppliedAt = appliedAt };
+            new () { Version = migration.VersionString, Name = migration.Name, AppliedAt = appliedAt };
     }
 }

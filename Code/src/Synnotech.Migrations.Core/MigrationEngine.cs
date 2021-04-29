@@ -13,7 +13,7 @@ namespace Synnotech.Migrations.Core
     /// </summary>
     /// <typeparam name="TSession">
     /// The type that represents the session being provided to the migrations. This type must also implement
-    /// <see cref="IAsyncMigrationSession{TMigrationInfo}" /> so that the migration engine can
+    /// <see cref="IMigrationSession{TMigrationInfo}" /> so that the migration engine can
     /// properly execute the necessary queries and commands against the target system.
     /// </typeparam>
     /// <typeparam name="TMigration">The type that represents the general abstraction for migrations.</typeparam>
@@ -21,16 +21,16 @@ namespace Synnotech.Migrations.Core
     /// The type that is stored in the target system to identify which migrations have already
     /// been applied.
     /// </typeparam>
-    public class AsyncMigrationEngine<TSession, TMigration, TMigrationInfo>
-        where TSession : IAsyncMigrationSession<TMigrationInfo>
-        where TMigration : class, IAsyncMigration<TSession>, IEquatable<TMigration>, IComparable<TMigration>
+    public class MigrationEngine<TSession, TMigration, TMigrationInfo>
+        where TSession : IMigrationSession<TMigrationInfo>
+        where TMigration : class, IMigration<TSession>, IEquatable<TMigration>, IComparable<TMigration>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="AsyncMigrationEngine{TContext,TMigration,TMigrationInfo}" />.
+        /// Initializes a new instance of <see cref="MigrationEngine{TSession,TMigration,TMigrationInfo}" />.
         /// </summary>
         /// <param name="sessionFactory">
         /// The factory that creates sessions to the target system. The session type must implement
-        /// <see cref="IAsyncMigrationSession{TMigrationInfo}" />
+        /// <see cref="IMigrationSession{TMigrationInfo}" />
         /// so that the migration engine can properly execute the necessary queries and commands against the target system.
         /// </param>
         /// <param name="migrationsProvider">The object that retrieves the migrations that need to be applied.</param>
@@ -39,9 +39,9 @@ namespace Synnotech.Migrations.Core
         /// the target system to identify which migrations have already been applied.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
-        public AsyncMigrationEngine(IAsyncSessionFactory<TSession, TMigration> sessionFactory,
-                                    IMigrationsProvider<TMigration, TMigrationInfo> migrationsProvider,
-                                    Func<TMigration, DateTime, TMigrationInfo> createMigrationInfo)
+        public MigrationEngine(ISessionFactory<TSession, TMigration> sessionFactory,
+                               IMigrationsProvider<TMigration, TMigrationInfo> migrationsProvider,
+                               Func<TMigration, DateTime, TMigrationInfo> createMigrationInfo)
         {
             SessionFactory = sessionFactory.MustNotBeNull(nameof(sessionFactory));
             MigrationsProvider = migrationsProvider.MustNotBeNull(nameof(migrationsProvider));
@@ -51,7 +51,7 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Gets the factory that creates the sessions used to query and update the target system.
         /// </summary>
-        public IAsyncSessionFactory<TSession, TMigration> SessionFactory { get; }
+        public ISessionFactory<TSession, TMigration> SessionFactory { get; }
 
         /// <summary>
         /// Gets the object that retrieves the migrations to be applied to the target system.
@@ -73,7 +73,7 @@ namespace Synnotech.Migrations.Core
         {
             migrationAssembly.MustNotBeNull(nameof(migrationAssembly));
 
-            using var session = SessionFactory.CreateSessionForRetrievingLatestMigrationInfo();
+            await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
             var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
             var migrationsToBeApplied = MigrationsProvider.DetermineMigrations(migrationAssembly, latestMigrationInfo);
             return new MigrationPlan<TMigration, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
@@ -119,7 +119,7 @@ namespace Synnotech.Migrations.Core
                 TSession? migrationSession = default;
                 try
                 {
-                    migrationSession = SessionFactory.CreateSessionForMigration(migration);
+                    migrationSession = await SessionFactory.CreateSessionForMigrationAsync(migration);
                     await migration.ApplyAsync(migrationSession);
                     await migrationSession.StoreMigrationInfoAsync(migrationInfo);
                     appliedMigrations.Add(migrationInfo);

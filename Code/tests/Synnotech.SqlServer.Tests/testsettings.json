@@ -1,0 +1,4 @@
+{
+    "runDatabaseIntegrationTests": false,
+    "connectionString": "Server=(localdb)\\mssqllocaldb;Database=SynnotechMsSqlTests;Integrated Security=True"
+}
