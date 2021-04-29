@@ -53,7 +53,7 @@ public sealed class Startup
 
 Please ensure that a registration for `IDocumentStore` is already present in the DI container. You can use [Synnotech.RavenDB](https://github.com/Synnotech-AG/Synnotech.RavenDB) to do that.
 
-We suggest that you run your migrations at the beginning of `Startup.Configure`, so that the target database is up to date every time the web app started. Of course, you are not limited to that - you could e.g. create a dedicated controller action that execute migrations.
+We suggest that you run your migrations at the beginning of `Startup.Configure`, so that the target database is up to date every time the web app starts. Of course, you are not limited to that - you could e.g. create a dedicated controller action that executes migrations.
 
 ## Setup in Other Apps
 
@@ -107,11 +107,11 @@ namespace MyRavenDBAccessLayer
 
 When writing migrations, keep the following things in mind:
 
-1. You don't need to call `session.SaveChangesAsync`: the migration engine will do that for you.
+1. You don't need to call `session.SaveChangesAsync` - the migration engine will do that for you.
 1. Every migration gets a fresh `MigrationSession` instance. `WaitForIndexesAfterSaveChanges` is activated by default, so you can be sure that you can query data that was inserted in previous migrations.
 1. Also, you do not need to add `MigrationInfo` instances manually to the database, the migration engine will do that for you.
 1. The `MigrationVersion` uses the default `System.Version` class internally to determine the version. We suggest you use [Semantic Versioning](https://semver.org/) for your migrations.
-1. We encourage you to organize your migations in a dedicated subfolder of your RavenDB data access folder / project.
+1. We encourage you to organize your migations in a dedicated subfolder of your RavenDB data access folder / project (see picture below).
 1. We suggest that you create a dedicated integration test that tries to apply all migrations at once to a fresh RavenDB database, thus you can be sure everything works correctly before rolling out your software.
 
 ![How to organize your migrations](how-to-organize-migrations.png)
@@ -126,7 +126,7 @@ The migration engine offers you three methods to apply migrations to the target 
 2. `GenerateMigrationPlanAsync` only checks the target database and retrieves information about the latest applied migration. It also determines which migrations need to be applied and returns both information. This is useful if the calling code wants to know if there are any pending migrations and then ask the user to confirm the database changes.
 3. `ApplyMigrationsAsync` takes a list of migrations and applies them to the target database. Is often used in combination with `GenerateMigrationPlanAsync`.
 
-In most apps, we suggest that you simply use `MigrateAsync` at application start to keep the database up-to-date. The two other methods are used if you have a dedicated Export-to-Database functionality where the user can agree or disagree with applying the latest migrations.
+In most apps, we suggest that you simply use `MigrateAsync` at application start to keep the database up-to-date. The two other methods are typically used if you have a dedicated Export-to-Database functionality where the user can agree or disagree with applying the latest migrations.
 
 ## Migration Summary
 
