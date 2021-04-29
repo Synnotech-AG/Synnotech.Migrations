@@ -1,0 +1,6 @@
+{
+    "runDatabaseIntegrationTests": true,
+    "ravenDbOptions": {
+        "frameworkVersion": "5.0.5"
+    }
+}
