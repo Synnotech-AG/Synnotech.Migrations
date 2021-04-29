@@ -82,7 +82,6 @@ namespace Synnotech.Migrations.Core.Tests
         public sealed class TestMigrationInfo : BaseMigrationInfo
         {
             public int Id { get; set; }
-            public DateTime AppliedAt { get; set; }
         }
 
         public sealed class TestContext : IMigrationSession<TestMigrationInfo>
