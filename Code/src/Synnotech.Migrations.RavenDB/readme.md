@@ -19,7 +19,7 @@ Synnotech.Migrations.RavenDB is available as a [NuGet package](https://www.nuget
 
 # Setting Up With the Default Configuration
 
-If you want to run with the default setup, registration is pretty easy. Synnotech.Migrations.RavenDB already includes a base class for migrations where you can derive from, a class called `MigrationInfos` that stores metadata about the applied migrations in the target database, as well as a `SessionFactory` and `MigrationEngine` that are used to apply migrations. Let's see how you can set this up.
+If you want to run with the default setup, registration is pretty easy. Synnotech.Migrations.RavenDB already includes a base class for migrations that you can derive from, a class called `MigrationInfos` that stores metadata about the applied migrations in the target database, as well as a `SessionFactory` and `MigrationEngine` that are used to apply migrations. Let's see how you can set this up.
 
 ## Set Up in ASP.NET Core Apps
 
