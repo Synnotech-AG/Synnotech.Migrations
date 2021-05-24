@@ -12,7 +12,7 @@ namespace Synnotech.Migrations.Core
     /// If possible, throw a <see cref="MigrationException" /> to indicate errors that
     /// occurred during the migration.
     /// </summary>
-    /// <typeparam name="TContext">The type that represents the context for database interactions.</typeparam>
+    /// <typeparam name="TContext">The type that represents the context for interactions with the target system.</typeparam>
     public interface IMigration<in TContext>
     {
         /// <summary>

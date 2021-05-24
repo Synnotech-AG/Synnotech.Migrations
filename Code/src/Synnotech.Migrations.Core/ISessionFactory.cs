@@ -1,23 +1,30 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Synnotech.Migrations.Core
 {
     /// <summary>
-    /// Represents a factory that creates session instances which communicate with the target system.
+    /// Represents the abstraction of a factory that creates different session instances for the migration engine.
+    /// These sessions are used to communicate with the target system to retrieve or store data.
     /// </summary>
-    /// <typeparam name="TMigrationSession">The type of the session.</typeparam>
-    /// <typeparam name="TMigration">The base type for all migrations.</typeparam>
-    public interface ISessionFactory<TMigrationSession, in TMigration>
+    /// <typeparam name="TMigrationInfo">
+    /// That type whose instances are stored in the target system to indicate which
+    /// migrations already have been applied.
+    /// </typeparam>
+    /// <typeparam name="TMigration">The base class that identifies all migrations.</typeparam>
+    /// <typeparam name="TContext">The type whose instances are passed to each migration when they are applied.</typeparam>
+    public interface ISessionFactory<TMigrationInfo, in TMigration, TContext>
     {
         /// <summary>
         /// Creates a new session that will be used to retrieve the latest applied migration info.
         /// </summary>
-        ValueTask<TMigrationSession> CreateSessionForRetrievingLatestMigrationInfoAsync();
+        ValueTask<IGetLatestMigrationInfoSession<TMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync();
 
         /// <summary>
         /// Creates a new session that will be used to execute the specified migration.
         /// </summary>
         /// <param name="migration">The migration to be executed.</param>
-        ValueTask<TMigrationSession> CreateSessionForMigrationAsync(TMigration migration);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
+        ValueTask<IMigrationSession<TContext, TMigrationInfo>> CreateSessionForMigrationAsync(TMigration migration);
     }
 }

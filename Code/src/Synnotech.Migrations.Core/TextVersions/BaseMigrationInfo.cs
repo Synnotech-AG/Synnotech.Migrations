@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Light.GuardClauses;
+using Light.GuardClauses.FrameworkExtensions;
 using Range = Light.GuardClauses.Range;
 
 namespace Synnotech.Migrations.Core.TextVersions
 {
     /// <summary>
-    /// Base class for default migration infos that uses a version internally.
+    /// Base class for migration infos that uses a version internally.
     /// This version is serialized as a string. by default in the format x.x.x
     /// (semantic version). All properties are mutable to support
     /// serialization to document or relational databases with different frameworks.
     /// </summary>
-    public abstract class BaseMigrationInfo : IComparable<MigrationVersionAttribute>
+    public abstract class BaseMigrationInfo : IHasMigrationVersion<Version>
+
     {
         private readonly int _fieldCount;
         private string? _name;
@@ -22,10 +24,8 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// </summary>
         /// <param name="fieldCount">The number of components that are returned from the internal version when it is serialized to a string. Default is 3 (semantic version).</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="fieldCount" /> is not in between 1 to 4</exception>
-        protected BaseMigrationInfo(int fieldCount = 3)
-        {
+        protected BaseMigrationInfo(int fieldCount = 3) =>
             _fieldCount = fieldCount.MustBeIn(Range.FromInclusive(1).ToInclusive(4), nameof(fieldCount));
-        }
 
         /// <summary>
         /// Gets or sets the version as a string.
@@ -52,21 +52,14 @@ namespace Synnotech.Migrations.Core.TextVersions
         public DateTime AppliedAt { get; set; }
 
         /// <summary>
-        /// Compares this migration info to the version attribute of a migration.
+        /// Returns the internal version or throws an <see cref="InvalidOperationException" /> when <see cref="Version" /> is not set.
         /// </summary>
-        /// <param name="other">The attribute that holds the migration of a migration.</param>
-        /// <returns>
-        /// A negative value when the internal version is null or less than the version of the attribute.
-        /// If both versions are equal, null is returned. Otherwise, a positive number is returned.
-        /// </returns>
-        public int CompareTo(MigrationVersionAttribute? other)
+        /// <exception cref="InvalidOperationException">Thrown when <see cref="Version" /> was not set before calling this method.</exception>
+        public Version GetMigrationVersion()
         {
-            other = other.MustNotBeNull(nameof(other));
-
             if (_version == null)
-                return -1;
-
-            return _version.CompareTo(other.Version);
+                throw new InvalidOperationException($"Version is not set on this migration info {Name.ToStringOrNull()}");
+            return _version;
         }
 
         /// <summary>
@@ -78,7 +71,7 @@ namespace Synnotech.Migrations.Core.TextVersions
         {
             if (_version == null)
             {
-                version = default;
+                version = null;
                 return false;
             }
 
@@ -90,20 +83,7 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// Sets the internal version to the specified value.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="version" /> is null.</exception>
-        public void SetInternalVersion(Version version)
-        {
-            _version = version.MustNotBeNull(nameof(version));
-        }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            if (_version == null)
-                return "Invalid Migration Info";
-
-            var version = Version!;
-            return _name == null ? version : version + " " + _name;
-        }
+        public void SetInternalVersion(Version version) => _version = version.MustNotBeNull(nameof(version));
 
         /// <summary>
         /// Checks if the specified object is a migration info and if the version is the same.
@@ -112,9 +92,21 @@ namespace Synnotech.Migrations.Core.TextVersions
             obj is BaseMigrationInfo migrationInfo && _version == migrationInfo._version;
 
         /// <summary>
-        /// Gets the hash code for this migration info.
+        /// Return the hash code for this migration info.
         /// </summary>
         // ReSharper disable once NonReadonlyMemberInGetHashCode -- _version cannot be readonly as this DTO might be used by ORMs / serializers that do not support constructor injection
         public override int GetHashCode() => _version?.GetHashCode() ?? 0;
+
+        /// <summary>
+        /// Returns the string representation of this migration info.
+        /// </summary>
+        public override string ToString()
+        {
+            if (_version == null)
+                return "Invalid Migration Info";
+
+            var version = Version!;
+            return _name == null ? version : version + " " + _name;
+        }
     }
 }

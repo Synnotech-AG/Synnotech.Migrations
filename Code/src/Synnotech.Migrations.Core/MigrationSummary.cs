@@ -13,10 +13,10 @@ namespace Synnotech.Migrations.Core
     public readonly struct MigrationSummary<TMigrationInfo> : IEquatable<MigrationSummary<TMigrationInfo>>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationSummary{TMigrationInfo}" /> that indicates that migrations were applied successfully.
+        /// Initializes a new instance of <see cref="MigrationSummary{TMigrationInfo}" /> that indicates that all migrations were applied successfully.
         /// </summary>
         /// <param name="appliedMigrations">The list of migrations that have been applied in this run.</param>
-        public MigrationSummary(List<TMigrationInfo> appliedMigrations)
+        public MigrationSummary(List<TMigrationInfo>? appliedMigrations)
         {
             AppliedMigrations = appliedMigrations;
             MigrationError = null;
@@ -27,26 +27,26 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         /// <param name="migrationError">The error that occurred during migration.</param>
         /// <param name="appliedMigrations">The migrations that were applied before the one where the error occurred.</param>
-        public MigrationSummary(MigrationError<TMigrationInfo> migrationError, List<TMigrationInfo>? appliedMigrations)
+        public MigrationSummary(IMigrationError migrationError, List<TMigrationInfo>? appliedMigrations)
         {
-            MigrationError = migrationError.MustNotBeNull(nameof(migrationError));
+            MigrationError = migrationError;
             AppliedMigrations = appliedMigrations;
         }
 
         /// <summary>
         /// Gets an empty instance, indicating that no migrations were applied.
         /// </summary>
-        public static MigrationSummary<TMigrationInfo> Empty => new();
+        public static MigrationSummary<TMigrationInfo> Empty => new ();
 
         /// <summary>
         /// Gets the collection of migrations that were applied.
         /// </summary>
-        public List<TMigrationInfo>? AppliedMigrations { get; }
+        private List<TMigrationInfo>? AppliedMigrations { get; }
 
         /// <summary>
         /// Gets a possible migration error that occurred during the migration.
         /// </summary>
-        public MigrationError<TMigrationInfo>? MigrationError { get; }
+        private IMigrationError? MigrationError { get; }
 
         /// <summary>
         /// Tries to get the collection of applied migrations.
@@ -57,7 +57,7 @@ namespace Synnotech.Migrations.Core
         {
             if (AppliedMigrations.IsNullOrEmpty())
             {
-                appliedMigrations = default;
+                appliedMigrations = null;
                 return false;
             }
 
@@ -69,16 +69,16 @@ namespace Synnotech.Migrations.Core
         /// Tries to get the error that occurred during migration.
         /// </summary>
         /// <param name="migrationError">The error that occurred during migration.</param>
-        public bool TryGetError([NotNullWhen(true)] out MigrationError<TMigrationInfo>? migrationError)
+        public bool TryGetError([NotNullWhen(true)] out IMigrationError? migrationError)
         {
-            if (MigrationError == null)
+            if (MigrationError != null)
             {
-                migrationError = null;
-                return false;
+                migrationError = MigrationError;
+                return true;
             }
 
-            migrationError = MigrationError;
-            return true;
+            migrationError = null;
+            return false;
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         public bool Equals(MigrationSummary<TMigrationInfo> other)
         {
-            if (MigrationError != other.MigrationError)
+            if (MigrationError is not null && !MigrationError.Equals(other.MigrationError) || other.MigrationError is not null)
                 return false;
             if (AppliedMigrations?.Count != other.AppliedMigrations?.Count || AppliedMigrations.IsNullOrEmpty())
                 return false;
@@ -136,15 +136,11 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Returns the string representation of this migration summary.
         /// </summary>
-        public override string ToString()
-        {
-            if (MigrationError != null)
-                return "Error occurred at migration " + MigrationError.MigrationWithError;
-
-            if (!AppliedMigrations.IsNullOrEmpty())
-                return "Migrations applied";
-
-            return "No migrations applied";
-        }
+        public override string ToString() =>
+            MigrationError != null ?
+                "Error occurred at migration " + MigrationError.ErroneousVersionText :
+                !AppliedMigrations.IsNullOrEmpty() ?
+                    "Migrations applied" :
+                    "No migrations applied";
     }
 }

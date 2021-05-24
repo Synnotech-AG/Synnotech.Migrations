@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Light.GuardClauses;
 
 namespace Synnotech.Migrations.Core
@@ -7,23 +7,29 @@ namespace Synnotech.Migrations.Core
     /// <summary>
     /// Captures an error that occurred during a migration.
     /// </summary>
-    public sealed class MigrationError<TMigrationInfo> : IEquatable<MigrationError<TMigrationInfo>>
+    public sealed class MigrationError<TMigrationVersion> : IMigrationError, IEquatable<MigrationError<TMigrationVersion>>
+        where TMigrationVersion : IEquatable<TMigrationVersion>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationError{TMigrationInfo}" />.
+        /// Initializes a new instance of <see cref="MigrationError{TMigrationVersion}" />.
         /// </summary>
-        /// <param name="migrationWithError">Metadata about the migration that could not be executed.</param>
+        /// <param name="versionWithError">The version of the migration that could not be executed.</param>
         /// <param name="exception">The exception that occurred during the migration.</param>
-        public MigrationError(TMigrationInfo migrationWithError, Exception exception)
+        public MigrationError(TMigrationVersion versionWithError, Exception exception)
         {
-            MigrationWithError = migrationWithError.MustNotBeNullReference(nameof(migrationWithError));
+            ErroneousVersion = versionWithError.MustNotBeNullReference(nameof(versionWithError));
             Exception = exception.MustNotBeNull(nameof(exception));
         }
 
         /// <summary>
-        /// Gets metadata about the migration that could not be executed.
+        /// Gets the version of the erroneous migration.
         /// </summary>
-        public TMigrationInfo MigrationWithError { get; }
+        public TMigrationVersion ErroneousVersion { get; }
+
+        /// <summary>
+        /// Gets the erroneous version as a string.
+        /// </summary>
+        public string ErroneousVersionText => ErroneousVersion.ToString();
 
         /// <summary>
         /// Gets the exception that was thrown when the migration was executed.
@@ -31,46 +37,46 @@ namespace Synnotech.Migrations.Core
         public Exception Exception { get; }
 
         /// <summary>
-        /// Checks if the specified migration error is equal to this instance.
-        /// This is true when the migration info represents the same migration as the other instance.
-        /// </summary>
-        public bool Equals(MigrationError<TMigrationInfo>? other)
-        {
-            if (other is null)
-                return false;
-            return EqualityComparer<TMigrationInfo>.Default.Equals(MigrationWithError, other.MigrationWithError);
-        }
-
-        /// <summary>
         /// Throws a new <see cref="MigrationException" /> containing the actual <see cref="Exception" /> as an inner exception.
         /// </summary>
         /// <exception cref="MigrationException">Always thrown</exception>
-        public void Rethrow() => throw new MigrationException($"Could not execute migration {MigrationWithError} successfully - please see the inner exception for details.", Exception);
+        [DoesNotReturn]
+        public void Rethrow() =>
+            throw new MigrationException($"Could not execute migration \"{ErroneousVersion}\" successfully - please see the inner exception for details", Exception);
 
         /// <summary>
         /// Checks if the specified object is a migration error and equal to this instance.
-        /// This is true when the migration info represents the same migration as the other instance.
+        /// This is true when the version represents the same migration as the other instance.
         /// </summary>
-        public override bool Equals(object obj) => obj is MigrationError<TMigrationInfo> error && Equals(error);
+        public bool Equals(MigrationError<TMigrationVersion>? other) =>
+            other is not null && ErroneousVersion.Equals(other.ErroneousVersion);
+
+        /// <summary>
+        /// Checks if the specified object is a migration error and equal to this instance.
+        /// This is true when the version represents the same migration as the other instance.
+        /// </summary>
+        public bool Equals(IMigrationError? migrationError) =>
+            migrationError is MigrationError<TMigrationVersion> error && Equals(error);
 
         /// <summary>
         /// Gets the hash code of this migration error.
         /// </summary>
-        public override int GetHashCode() => MigrationWithError!.GetHashCode();
+        public override bool Equals(object obj) =>
+            obj is MigrationError<TMigrationVersion> error && Equals(error);
+
+        /// <summary>
+        /// Gets the hash code of this migration error.
+        /// </summary>
+        public override int GetHashCode() => ErroneousVersion.GetHashCode();
 
         /// <summary>
         /// Equality operator
         /// </summary>
-        public static bool operator ==(MigrationError<TMigrationInfo>? x, MigrationError<TMigrationInfo>? y)
-        {
-            if (x is null)
-                return y is null;
-            return x.Equals(y);
-        }
+        public static bool operator ==(MigrationError<TMigrationVersion> x, MigrationError<TMigrationVersion> y) => x.Equals(y);
 
         /// <summary>
         /// Inequality operator
         /// </summary>
-        public static bool operator !=(MigrationError<TMigrationInfo>? x, MigrationError<TMigrationInfo>? y) => !(x == y);
+        public static bool operator !=(MigrationError<TMigrationVersion> x, MigrationError<TMigrationVersion> y) => !x.Equals(y);
     }
 }

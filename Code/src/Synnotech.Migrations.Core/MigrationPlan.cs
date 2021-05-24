@@ -8,33 +8,34 @@ namespace Synnotech.Migrations.Core
     /// <summary>
     /// Represents a plan that contains the current version of the target system and the pending migrations that need to be applied to it.
     /// </summary>
-    /// <typeparam name="TMigration">The type that represents the general abstraction for migrations.</typeparam>
+    /// <typeparam name="TMigrationVersion">The type that represents a migration version.</typeparam>
     /// <typeparam name="TMigrationInfo">
     /// The type that is stored in the target system to identify which migrations have already been applied.
     /// </typeparam>
-    public readonly struct MigrationPlan<TMigration, TMigrationInfo> : IEquatable<MigrationPlan<TMigration, TMigrationInfo>>
+    public readonly struct MigrationPlan<TMigrationVersion, TMigrationInfo> : IEquatable<MigrationPlan<TMigrationVersion, TMigrationInfo>>
+        where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
+        where TMigrationInfo : IHasMigrationVersion<TMigrationVersion>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationPlan{TMigration, TMigrationInfo}" />.
+        /// Initializes a new instance of <see cref="MigrationPlan{TMigrationVersion, TMigrationInfo}" />.
         /// </summary>
-        /// <param name="currentVersion">The version that is currently applied to the target system.</param>
+        /// <param name="currentVersionInfo">The migration info indicating the version that is currently applied to the target system.</param>
         /// <param name="pendingMigrations">The list of migrations that need to be applied to the target system.</param>
-        public MigrationPlan(TMigrationInfo? currentVersion,
-                             List<TMigration>? pendingMigrations)
+        public MigrationPlan(TMigrationInfo? currentVersionInfo, List<PendingMigration<TMigrationVersion>>? pendingMigrations)
         {
-            CurrentVersion = currentVersion;
+            CurrentVersionInfo = currentVersionInfo;
             PendingMigrations = pendingMigrations;
         }
 
         /// <summary>
         /// Gets the version that is currently applied to the target database.
         /// </summary>
-        public TMigrationInfo? CurrentVersion { get; }
+        public TMigrationInfo? CurrentVersionInfo { get; }
 
         /// <summary>
-        /// Gets the list of migrations that will be applied by the engine.
+        /// Gets the list of pending migrations.
         /// </summary>
-        public List<TMigration>? PendingMigrations { get; }
+        public List<PendingMigration<TMigrationVersion>>? PendingMigrations { get; }
 
         /// <summary>
         /// Gets the value indicating whether there are pending migrations.
@@ -42,31 +43,38 @@ namespace Synnotech.Migrations.Core
         public bool HasPendingMigrations => !PendingMigrations.IsNullOrEmpty();
 
         /// <summary>
-        /// Checks if the other migration plan is equal to this instance. For this to be true, the current version as well
-        /// as each migration to be applied must be equal in both plans.
+        /// Checks if the other migration plan is equal to this instance. For this to be true, the current version info
+        /// as well as each migration to be applied must be equal in both plans.
         /// </summary>
-        public bool Equals(MigrationPlan<TMigration, TMigrationInfo> other)
+        public bool Equals(MigrationPlan<TMigrationVersion, TMigrationInfo> other)
         {
-            if (!EqualityComparer<TMigrationInfo?>.Default.Equals(CurrentVersion, other.CurrentVersion))
+            if (!CheckIfCurrentVersionsAreEqual(CurrentVersionInfo, other.CurrentVersionInfo))
                 return false;
             if (PendingMigrations?.Count != other.PendingMigrations?.Count || PendingMigrations.IsNullOrEmpty())
                 return false;
 
             for (var i = 0; i < PendingMigrations.Count; i++)
             {
-                if (!EqualityComparer<TMigration>.Default.Equals(PendingMigrations[i], other.PendingMigrations![i]))
+                var thisMigration = PendingMigrations[i];
+                var otherMigration = other.PendingMigrations![i];
+
+                if (thisMigration != otherMigration)
                     return false;
             }
 
             return true;
+
+            static bool CheckIfCurrentVersionsAreEqual(TMigrationInfo? x, TMigrationInfo? y) =>
+            x is null ?
+                y is null :
+                y is not null && x.GetMigrationVersion().Equals(y.GetMigrationVersion());
         }
 
         /// <summary>
         /// Checks if the specified object is a migration plan and if it has the same values as this instance.
-        /// For this to be true, the current version as well as each migration to be applied must be equal in both plans.
+        /// For this to be true, the current version info as well as each migration to be applied must be equal in both plans.
         /// </summary>
-        public override bool Equals(object obj) =>
-            obj is MigrationPlan<TMigration, TMigrationInfo> plan && Equals(plan);
+        public override bool Equals(object obj) => obj is MigrationPlan<TMigrationVersion, TMigrationInfo> migrationPlan && Equals(migrationPlan);
 
         /// <summary>
         /// Gets the hash code of this migration plan.
@@ -74,10 +82,10 @@ namespace Synnotech.Migrations.Core
         public override int GetHashCode()
         {
             if (PendingMigrations.IsNullOrEmpty())
-                return CurrentVersion?.GetHashCode() ?? 0;
+                return CurrentVersionInfo?.GetHashCode() ?? 0;
 
             var builder = MultiplyAddHashBuilder.Create();
-            builder.CombineIntoHash(CurrentVersion);
+            builder.CombineIntoHash(CurrentVersionInfo);
 
             for (var i = 0; i < PendingMigrations.Count; i++)
             {

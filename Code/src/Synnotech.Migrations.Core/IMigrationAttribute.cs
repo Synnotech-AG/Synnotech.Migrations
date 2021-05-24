@@ -3,9 +3,10 @@
 namespace Synnotech.Migrations.Core
 {
     /// <summary>
-    /// Represents the abstraction of a migration version attribute.
+    /// Represents the abstraction of a verifiable migration attribute, identifying the
+    /// version of the migration.
     /// </summary>
-    public interface IMigrationVersionAttribute
+    public interface IMigrationAttribute
     {
         /// <summary>
         /// Validates that the version value passed to the attribute is valid.

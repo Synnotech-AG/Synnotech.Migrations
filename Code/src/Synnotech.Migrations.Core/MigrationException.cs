@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Synnotech.Migrations.Core
 {
     /// <summary>
-    /// Represents an error that occurred during a migration. The cause is usually misconfiguration of the migration engine.
+    /// Represents an error that occurred during a migration.
     /// </summary>
     [Serializable]
     public class MigrationException : Exception

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Light.GuardClauses;
+using Light.GuardClauses.Exceptions;
 
 namespace Synnotech.Migrations.Core
 {
@@ -11,128 +12,129 @@ namespace Synnotech.Migrations.Core
     /// the target assembly, compares them to the latest applied migration of the target system
     /// and then applies the pending migrations.
     /// </summary>
-    /// <typeparam name="TSession">
-    /// The type that represents the session being provided to the migrations. This type must also implement
-    /// <see cref="IMigrationSession{TMigrationInfo}" /> so that the migration engine can
-    /// properly execute the necessary queries and commands against the target system.
+    /// <typeparam name="TMigrationVersion">The type that represents a migration version. It must be equatable and comparable.</typeparam>
+    /// <typeparam name="TMigration">
+    /// The base class that identifies all migrations. Must implement <see cref="IMigration{TContext}" /> and
+    /// <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
     /// </typeparam>
-    /// <typeparam name="TMigration">The type that represents the general abstraction for migrations.</typeparam>
+    /// <typeparam name="TMigrationAttribute">
+    /// The type that represents the attribute being applied to migrations to indicate their version.
+    /// Must implement <see cref="IMigrationAttribute"/> and <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
+    /// </typeparam>
     /// <typeparam name="TMigrationInfo">
-    /// The type that is stored in the target system to identify which migrations have already
-    /// been applied.
+    /// That type whose instances are stored in the target system to indicate which
+    /// migrations already have been applied.
     /// </typeparam>
-    public class MigrationEngine<TSession, TMigration, TMigrationInfo>
-        where TSession : IMigrationSession<TMigrationInfo>
-        where TMigration : class, IMigration<TSession>, IEquatable<TMigration>, IComparable<TMigration>
+    /// <typeparam name="TMigrationContext">The type whose instances are passed to each migration when they are applied.</typeparam>
+    public class MigrationEngine<TMigrationVersion, TMigration, TMigrationAttribute, TMigrationInfo, TMigrationContext>
+        where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
+        where TMigration : IMigration<TMigrationContext>, IHasMigrationVersion<TMigrationVersion>
+        where TMigrationAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<TMigrationVersion>
+        where TMigrationInfo : IHasMigrationVersion<TMigrationVersion>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationEngine{TSession,TMigration,TMigrationInfo}" />.
+        /// Initializes a new instance of <see cref="MigrationEngine{TMigrationVersion,TMigration,TMigrationAttribute,TMigrationInfo,TMigrationContext}"/>.
         /// </summary>
-        /// <param name="sessionFactory">
-        /// The factory that creates sessions to the target system. The session type must implement
-        /// <see cref="IMigrationSession{TMigrationInfo}" />
-        /// so that the migration engine can properly execute the necessary queries and commands against the target system.
-        /// </param>
-        /// <param name="migrationsProvider">The object that retrieves the migrations that need to be applied.</param>
-        /// <param name="createMigrationInfo">
-        /// The factory delegate that creates migration info objects being stored in
-        /// the target system to identify which migrations have already been applied.
-        /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
-        public MigrationEngine(ISessionFactory<TSession, TMigration> sessionFactory,
-                               IMigrationsProvider<TMigration, TMigrationInfo> migrationsProvider,
+        /// <param name="sessionFactory">The factory that is used to create session objects to the target system.</param>
+        /// <param name="migrationFactory">The factory that is used to instantiate migration objects.</param>
+        /// <param name="createMigrationInfo">The delegate that is used to instantiate migration infos.</param>
+        /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+        public MigrationEngine(ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> sessionFactory,
+                               IMigrationFactory<TMigration> migrationFactory,
                                Func<TMigration, DateTime, TMigrationInfo> createMigrationInfo)
         {
             SessionFactory = sessionFactory.MustNotBeNull(nameof(sessionFactory));
-            MigrationsProvider = migrationsProvider.MustNotBeNull(nameof(migrationsProvider));
+            MigrationFactory = migrationFactory.MustNotBeNull(nameof(migrationFactory));
             CreateMigrationInfo = createMigrationInfo.MustNotBeNull(nameof(createMigrationInfo));
         }
 
-        /// <summary>
-        /// Gets the factory that creates the sessions used to query and update the target system.
-        /// </summary>
-        public ISessionFactory<TSession, TMigration> SessionFactory { get; }
-
-        /// <summary>
-        /// Gets the object that retrieves the migrations to be applied to the target system.
-        /// </summary>
-        public IMigrationsProvider<TMigration, TMigrationInfo> MigrationsProvider { get; }
-
-        /// <summary>
-        /// Gets the factory delegate that creates a new migration info object.
-        /// </summary>
-        public Func<TMigration, DateTime, TMigrationInfo> CreateMigrationInfo { get; }
+        private ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> SessionFactory { get; }
+        private IMigrationFactory<TMigration> MigrationFactory { get; }
+        private Func<TMigration, DateTime, TMigrationInfo> CreateMigrationInfo { get; }
 
         /// <summary>
         /// Generates a plan that contains information about the latest applied migration on the target system
         /// and the migrations that need to be applied.
         /// </summary>
-        /// <param name="migrationAssembly">The target assembly that is to be searched for migrations.</param>
+        /// <param name="assembliesContainingMigrations">The assemblies that will be searched for migration types.</param>
         /// <returns>A plan that describes the latest applied migration and the pending migrations.</returns>
-        public virtual async Task<MigrationPlan<TMigration, TMigrationInfo>> GenerateMigrationPlanAsync(Assembly migrationAssembly)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
+        /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
+        /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
+        public virtual async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(params Assembly[] assembliesContainingMigrations)
         {
-            migrationAssembly.MustNotBeNull(nameof(migrationAssembly));
+            assembliesContainingMigrations.MustNotBeNullOrEmpty(nameof(assembliesContainingMigrations));
 
             await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
+
             var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
-            var migrationsToBeApplied = MigrationsProvider.DetermineMigrations(migrationAssembly, latestMigrationInfo);
-            return new MigrationPlan<TMigration, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
+
+            var latestId = default(TMigrationVersion);
+            if (latestMigrationInfo != null)
+                latestId = latestMigrationInfo.GetMigrationVersion();
+
+            var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
+            return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
         }
 
         /// <summary>
         /// Determines and applies migrations to the target system. This is done by getting the
         /// latest applied migration info from the target system, picking the migrations
         /// that must be executed, and applying them to the target system.
+        /// PLEASE NOTE: when migrations are applied, all exceptions are caught by the migration engine.
+        /// Exceptions are not caught in the analysis phase beforehand (when the latest migration info is retrieved).
+        /// This means that you must analyze the summary for errors (e.g. via <see cref="MigrationSummary{TMigrationInfo}.EnsureSuccess" />)
+        /// to ensure that no errors occurred during a run.
         /// </summary>
-        /// <param name="migrationAssembly">The target assembly that is to be searched for migrations.</param>
-        /// <param name="now">
-        /// The current time when the migration engine starts to execute. Please use a UTC time stamp if
-        /// possible.
-        /// </param>
-        /// <returns>A summary of all migrations that have been applied in this run.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migrationAssembly" /> is null.</exception>
-        public virtual async Task<MigrationSummary<TMigrationInfo>> MigrateAsync(Assembly migrationAssembly, DateTime now)
+        /// <param name="now">The current time when the migration engine starts to execute. Please use a UTC time stamp if possible.</param>
+        /// <param name="assembliesContainingMigrations">The assemblies that will be searched for migration types.</param>
+        /// <returns>A summary of all migrations that have been applied in this run and an optional error that might have occurred during a migration.</returns>
+        /// /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
+        /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
+        /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
+        public virtual async Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime now, params Assembly[] assembliesContainingMigrations)
         {
-            var migrationPlan = await GenerateMigrationPlanAsync(migrationAssembly);
+            var migrationPlan = await GetPlanForNewMigrationsAsync(assembliesContainingMigrations);
             return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
         }
 
         /// <summary>
         /// Applies the provided migrations to the target system. The engine does not check
-        /// if the specified migrations already exist.
+        /// if the specified migrations were already applied.
+        /// PLEASE NOTE: this method will not throw. You must check the resulting summary for errors that might have occurred.
         /// </summary>
-        /// <param name="migrations">The list of migrations that should be applied.</param>
-        /// <param name="now">
-        /// The current time when the migration engine starts to execute. Please use a UTC time stamp if
-        /// possible.
-        /// </param>
+        /// <param name="pendingMigrations">The list of migrations that should be applied.</param>
+        /// <param name="now">The current time when the migration engine starts to execute. Please use a UTC time stamp if possible.</param>
         /// <returns>A summary of all migrations that have been applied in this run.</returns>
-        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<TMigration>? migrations, DateTime now)
+        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<PendingMigration<TMigrationVersion>>? pendingMigrations, DateTime now)
         {
-            if (migrations.IsNullOrEmpty())
+            if (pendingMigrations.IsNullOrEmpty())
                 return MigrationSummary<TMigrationInfo>.Empty;
 
-            var appliedMigrations = new List<TMigrationInfo>();
-            foreach (var migration in migrations)
+            var appliedMigrations = new List<TMigrationInfo>(pendingMigrations.Count);
+            for (var i = 0; i < pendingMigrations.Count; i++)
             {
-                var migrationInfo = CreateMigrationInfo(migration, now);
-                TSession? migrationSession = default;
+                var pendingMigration = pendingMigrations[i];
+
+                IMigrationSession<TMigrationContext, TMigrationInfo>? session = null;
                 try
                 {
-                    migrationSession = await SessionFactory.CreateSessionForMigrationAsync(migration);
-                    await migration.ApplyAsync(migrationSession);
-                    await migrationSession.StoreMigrationInfoAsync(migrationInfo);
-                    appliedMigrations.Add(migrationInfo);
-                    await migrationSession.SaveChangesAsync();
+                    var migration = MigrationFactory.CreateMigration(pendingMigration.MigrationType);
+                    session = await SessionFactory.CreateSessionForMigrationAsync(migration);
+                    await migration.ApplyAsync(session.Context);
+                    var migrationInfo = CreateMigrationInfo(migration, now);
+                    await session.StoreMigrationInfoAsync(migrationInfo);
+                    await session.SaveChangesAsync();
                 }
                 catch (Exception exception)
                 {
-                    var error = new MigrationError<TMigrationInfo>(migrationInfo, exception);
+                    var error = new MigrationError<TMigrationVersion>(pendingMigration.MigrationVersion, exception);
                     return new MigrationSummary<TMigrationInfo>(error, appliedMigrations);
                 }
                 finally
                 {
-                    migrationSession?.Dispose();
+                    if (session != null)
+                        await session.DisposeAsync();
                 }
             }
 

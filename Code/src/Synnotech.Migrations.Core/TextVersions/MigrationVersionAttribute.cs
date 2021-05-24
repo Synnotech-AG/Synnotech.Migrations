@@ -7,7 +7,7 @@ namespace Synnotech.Migrations.Core.TextVersions
     /// Represents the version of a migration that can be obtained via reflection.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class MigrationVersionAttribute : Attribute, IMigrationVersionAttribute
+    public sealed class MigrationVersionAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<Version>
     {
         private readonly Version? _version;
         private readonly string _versionText;
@@ -31,10 +31,15 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// </summary>
         public Version Version => _version ?? throw new ArgumentException($"The specified version {_versionText.ToStringOrNull()} cannot be parsed.");
 
-        /// <inheritdoc />
+        Version IHasMigrationVersion<Version>.GetMigrationVersion() => Version;
+
+        /// <summary>
+        /// Throws a migration exception when <see cref="Version" /> was not set properly.
+        /// </summary>
         public void Validate(Type migrationType)
         {
             if (_version == null)
-                throw new ArgumentException($"The specified version {_versionText.ToStringOrNull()} of migration {migrationType.ToStringOrNull()} cannot be parsed.");}
+                throw new MigrationException($"The specified version {_versionText.ToStringOrNull()} of migration {migrationType.ToStringOrNull()} cannot be parsed.");
+        }
     }
 }
