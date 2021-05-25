@@ -58,7 +58,7 @@ namespace Synnotech.Migrations.Core.TextVersions
         public Version GetMigrationVersion()
         {
             if (_version == null)
-                throw new InvalidOperationException($"Version is not set on this migration info {Name.ToStringOrNull()}");
+                throw new InvalidOperationException($"Version is not set on migration info {Name.ToStringOrNull()}.");
             return _version;
         }
 

@@ -14,7 +14,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
 
         [Fact]
         public static void MustImplementIMigrationVersionAttribute() =>
-            typeof(MigrationVersionAttribute).Should().Implement<IMigrationVersionAttribute>();
+            typeof(MigrationVersionAttribute).Should().Implement<IMigrationAttribute>();
 
         [Theory]
         [InlineData("1.0.0")]
@@ -48,7 +48,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
 
             getVersion.Should().Throw<ArgumentException>()
                       .And.Message.Should().Be($"The specified version {invalidVersion.ToStringOrNull()} cannot be parsed.");
-            validate.Should().Throw<ArgumentException>()
+            validate.Should().Throw<MigrationException>()
                     .And.Message.Should().Be($"The specified version {invalidVersion.ToStringOrNull()} of migration \"{typeof(MigrationVersionAttributeTests)}\" cannot be parsed.");
         }
     }

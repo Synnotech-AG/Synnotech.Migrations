@@ -24,33 +24,6 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 { new Migration2(), null, false }
             };
 
-        [Theory]
-        [MemberData(nameof(CompareToData))]
-        public static void CompareTo(TestMigration x, TestMigration y, int expectedResult)
-        {
-            x.CompareTo(y).Should().Be(expectedResult);
-        }
-
-        public static readonly TheoryData<TestMigration, TestMigration, int> CompareToData =
-            new()
-            {
-                { new Migration1(), new Migration1(), 0 },
-                { new Migration1(), new Migration2(), -1 },
-                { new Migration3(), new Migration2(), 1 }
-            };
-
-        [Fact]
-        public static void CompareToOtherIsNull()
-        {
-            var migration = new Migration1();
-
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            Action act = () => migration.CompareTo(null!);
-
-            act.Should().Throw<ArgumentNullException>()
-               .And.ParamName.Should().Be("other");
-        }
-
         [Fact]
         public static void MissingAttribute()
         {
@@ -76,7 +49,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 new Migration3()
             };
 
-        public abstract class TestMigration : BaseMigration<TestMigration> { }
+        public abstract class TestMigration : BaseMigration { }
 
         [MigrationVersion("1.0.0")]
         public sealed class Migration1 : TestMigration

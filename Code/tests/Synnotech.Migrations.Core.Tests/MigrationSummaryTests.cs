@@ -36,19 +36,22 @@ namespace Synnotech.Migrations.Core.Tests
         [InlineData(null, new[] { 1, 2, 3, 4, 5 })]
         public static void CheckEquality(int? error, int[] appliedMigrations)
         {
-            var first = error == null ? new MigrationSummary<int>(new List<int>(appliedMigrations)) : new MigrationSummary<int>(new MigrationError<int>(error.Value, new Exception()), new List<int>(appliedMigrations));
-            var second = error == null ? new MigrationSummary<int>(new List<int>(appliedMigrations)) : new MigrationSummary<int>(new MigrationError<int>(error.Value, new Exception()), new List<int>(appliedMigrations));
+            var first = CreateSummary(error, appliedMigrations);
+            var second = CreateSummary(error, appliedMigrations);
 
             first.Should().Be(second);
             first.GetHashCode().Should().Be(second.GetHashCode());
+
+            static MigrationSummary<int> CreateSummary(int? error, int[] appliedMigrations) =>
+                error == null ?
+                    new MigrationSummary<int>(new List<int>(appliedMigrations)) :
+                    new MigrationSummary<int>(new MigrationError<int>(error.Value, new Exception()), new List<int>(appliedMigrations));
         }
 
         [Theory]
         [MemberData(nameof(InequalityData))]
-        public static void CheckInequality(MigrationSummary<int> first, MigrationSummary<int> second)
-        {
+        public static void CheckInequality(MigrationSummary<int> first, MigrationSummary<int> second) =>
             first.Should().NotBe(second);
-        }
 
         public static readonly TheoryData<MigrationSummary<int>, MigrationSummary<int>> InequalityData =
             new()

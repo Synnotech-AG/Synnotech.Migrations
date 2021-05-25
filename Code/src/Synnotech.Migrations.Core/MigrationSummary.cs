@@ -93,7 +93,7 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         public bool Equals(MigrationSummary<TMigrationInfo> other)
         {
-            if (MigrationError is not null && !MigrationError.Equals(other.MigrationError) || other.MigrationError is not null)
+            if (!(MigrationError?.Equals(other.MigrationError) ?? other.MigrationError is null))
                 return false;
             if (AppliedMigrations?.Count != other.AppliedMigrations?.Count || AppliedMigrations.IsNullOrEmpty())
                 return false;

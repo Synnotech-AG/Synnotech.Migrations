@@ -5,13 +5,13 @@ using FluentAssertions;
 using Synnotech.Migrations.Core.TextVersions;
 using Xunit;
 
-namespace Synnotech.Migrations.Core.Tests
+namespace Synnotech.Migrations.Core.Tests.TextVersions
 {
     public sealed class MigrationEngineTests
     {
-        private readonly TestContext _context = new();
-        private readonly DateTime _utcNow = DateTime.UtcNow;
-        private readonly TestMigrationInfoFactory _migrationInfoFactory = new();
+        private TestContext Context { get; } = new();
+        private DateTime UtcNow { get; } = DateTime.UtcNow;
+        private TestMigrationInfoFactory MigrationInfoFactory { get; } = new();
 
         [Fact]
         public async Task ExecuteAllMigrations()
@@ -21,53 +21,55 @@ namespace Synnotech.Migrations.Core.Tests
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
             var expectedMigrationInfos = new List<TestMigrationInfo>
             {
-                new() { Id = 1, Version = "0.1.0", Name = nameof(Migration1), AppliedAt = _utcNow },
-                new() { Id = 2, Version = "0.2.0", Name = nameof(Migration2), AppliedAt = _utcNow },
-                new() { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = _utcNow }
+                new() { Id = 1, Version = "0.1.0", Name = nameof(Migration1), AppliedAt = UtcNow },
+                new() { Id = 2, Version = "0.2.0", Name = nameof(Migration2), AppliedAt = UtcNow },
+                new() { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos, config => config.WithStrictOrdering());
-            _context.MustBeCommittedAndDisposed();
+            Context.MustBeCommittedAndDisposed();
         }
 
         [Fact]
         public async Task ExecuteMigrationsWithHigherVersion()
         {
-            _migrationInfoFactory.Count = 2;
-            _context.LatestMigrationInfo = new TestMigrationInfo { Id = 2, Version = "0.2.0", Name = nameof(Migration2), AppliedAt = _utcNow.AddDays(-2) };
+            MigrationInfoFactory.Count = 2;
+            Context.LatestMigrationInfo = new TestMigrationInfo { Id = 2, Version = "0.2.0", Name = nameof(Migration2), AppliedAt = UtcNow.AddDays(-2) };
 
             var summary = await RunMigrationAsync();
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
             var expectedMigrationInfos = new List<TestMigrationInfo>
             {
-                new() { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = _utcNow }
+                new() { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos);
-            _context.MustBeCommittedAndDisposed();
+            Context.MustBeCommittedAndDisposed();
         }
 
         [Fact]
         public async Task AllMigrationsPresent()
         {
-            _context.LatestMigrationInfo = new TestMigrationInfo { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = _utcNow.AddMinutes(-120) };
+            Context.LatestMigrationInfo = new TestMigrationInfo { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow.AddMinutes(-120) };
 
             var summary = await RunMigrationAsync();
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
             appliedMigrations.Should().BeNullOrEmpty();
-            summary.AppliedMigrations.Should().BeNullOrEmpty();
-            _context.MustBeRolledBackAndDisposed();
+            Context.MustBeRolledBackAndDisposed();
         }
 
         private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync()
         {
-            var migrationsProvider = new AttributeMigrationsProvider<TestMigration, TestMigrationInfo>();
-            var engine = new MigrationEngine<TestContext, TestMigration, TestMigrationInfo>(new TestSessionFactory(_context), migrationsProvider, _migrationInfoFactory.Create);
-            return engine.MigrateAsync(typeof(MigrationEngineTests).Assembly, _utcNow);
+            var engine = new MigrationEngine<TestMigration, TestMigrationInfo, TestContext>(new TestSessionFactory(Context), new ActivatorMigrationFactory<TestMigration>(), MigrationInfoFactory.Create);
+            return engine.MigrateAsync(UtcNow, typeof(MigrationEngineTests).Assembly);
         }
 
-        public abstract class TestMigration : BaseMigration<TestMigration>, IMigration<TestContext>
+        public abstract class TestMigration : BaseMigration, IMigration<TestContext>
         {
-            public Task ApplyAsync(TestContext context) => Task.CompletedTask;
+            public Task ApplyAsync(TestContext context)
+            {
+                context.Should().NotBeNull();
+                return Task.CompletedTask;
+            }
         }
 
         [MigrationVersion("0.1.0")]
@@ -84,7 +86,9 @@ namespace Synnotech.Migrations.Core.Tests
             public int Id { get; set; }
         }
 
-        public sealed class TestContext : IMigrationSession<TestMigrationInfo>
+
+
+        public sealed class TestContext : IGetLatestMigrationInfoSession<TestMigrationInfo>, IMigrationSession<TestContext, TestMigrationInfo>
         {
             public int DisposeCallCount;
             public TestMigrationInfo? LatestMigrationInfo;
@@ -96,10 +100,12 @@ namespace Synnotech.Migrations.Core.Tests
             public Task<TestMigrationInfo?> GetLatestMigrationInfoAsync() =>
                 Task.FromResult(LatestMigrationInfo);
 
-            public Task StoreMigrationInfoAsync(TestMigrationInfo migrationInfo)
+            public TestContext Context => this;
+
+            public ValueTask StoreMigrationInfoAsync(TestMigrationInfo migrationInfo)
             {
                 StoredMigrationInfos.Add(migrationInfo);
-                return Task.CompletedTask;
+                return default;
             }
 
             public Task SaveChangesAsync()
@@ -129,7 +135,7 @@ namespace Synnotech.Migrations.Core.Tests
             public ValueTask DisposeAsync()
             {
                 Dispose();
-                return ValueTask.CompletedTask;
+                return default;
             }
         }
 
@@ -142,22 +148,22 @@ namespace Synnotech.Migrations.Core.Tests
                 return new()
                 {
                     Id = ++Count,
-                    Version = migration.VersionString,
+                    Version = migration.ConvertVersionToString(),
                     Name = migration.Name,
                     AppliedAt = appliedAtUtc
                 };
             }
         }
 
-        public sealed class TestSessionFactory : ISessionFactory<TestContext, TestMigration>
+        public sealed class TestSessionFactory : ISessionFactory<TestMigrationInfo, TestMigration, TestContext>
         {
             private readonly TestContext _testContext;
 
             public TestSessionFactory(TestContext testContext) => _testContext = testContext;
 
-            public ValueTask<TestContext> CreateSessionForRetrievingLatestMigrationInfoAsync() => new (_testContext);
+            public ValueTask<IGetLatestMigrationInfoSession<TestMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync() => new (_testContext);
 
-            public ValueTask<TestContext> CreateSessionForMigrationAsync(TestMigration migration) => new (_testContext);
+            public ValueTask<IMigrationSession<TestContext, TestMigrationInfo>> CreateSessionForMigrationAsync(TestMigration migration) => new (_testContext);
         }
     }
 }

@@ -35,8 +35,8 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Initializes a new instance of <see cref="MigrationEngine{TMigrationVersion,TMigration,TMigrationAttribute,TMigrationInfo,TMigrationContext}"/>.
         /// </summary>
-        /// <param name="sessionFactory">The factory that is used to create session objects to the target system.</param>
-        /// <param name="migrationFactory">The factory that is used to instantiate migration objects.</param>
+        /// <param name="sessionFactory">The factory that is used to create sessions which are used to access the target system.</param>
+        /// <param name="migrationFactory">The factory that is used to instantiate migrations.</param>
         /// <param name="createMigrationInfo">The delegate that is used to instantiate migration infos.</param>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         public MigrationEngine(ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> sessionFactory,
@@ -48,9 +48,20 @@ namespace Synnotech.Migrations.Core
             CreateMigrationInfo = createMigrationInfo.MustNotBeNull(nameof(createMigrationInfo));
         }
 
-        private ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> SessionFactory { get; }
-        private IMigrationFactory<TMigration> MigrationFactory { get; }
-        private Func<TMigration, DateTime, TMigrationInfo> CreateMigrationInfo { get; }
+        /// <summary>
+        /// Gets the factory used to create sessions to the target system.
+        /// </summary>
+        protected ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> SessionFactory { get; }
+
+        /// <summary>
+        /// Gets the factory that is used to instantiate migrations from types.
+        /// </summary>
+        protected IMigrationFactory<TMigration> MigrationFactory { get; }
+
+        /// <summary>
+        /// Gets the delegate that is used to create migration infos.
+        /// </summary>
+        protected Func<TMigration, DateTime, TMigrationInfo> CreateMigrationInfo { get; }
 
         /// <summary>
         /// Generates a plan that contains information about the latest applied migration on the target system
@@ -125,6 +136,7 @@ namespace Synnotech.Migrations.Core
                     var migrationInfo = CreateMigrationInfo(migration, now);
                     await session.StoreMigrationInfoAsync(migrationInfo);
                     await session.SaveChangesAsync();
+                    appliedMigrations.Add(migrationInfo);
                 }
                 catch (Exception exception)
                 {

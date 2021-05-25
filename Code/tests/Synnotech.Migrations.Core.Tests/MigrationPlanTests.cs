@@ -1,15 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
+using Synnotech.Migrations.Core.Tests.TestHelpers;
 using Xunit;
 
 namespace Synnotech.Migrations.Core.Tests
 {
     public static class MigrationPlanTests
     {
+        private static Type DummyMigrationType { get; } = typeof(MigrationPlanTests);
+
         [Fact]
         public static void HasPendingMigrations()
         {
-            var plan = new MigrationPlan<int, int?>(null, new List<int> { 1 });
+            var plan = new MigrationPlan<int, IntMigrationInfo>(
+                null,
+                new List<PendingMigration<int>>(1) { new (1, DummyMigrationType) }
+            );
 
             plan.HasPendingMigrations.Should().BeTrue();
         }
@@ -17,7 +25,7 @@ namespace Synnotech.Migrations.Core.Tests
         [Fact]
         public static void HasNoPendingMigrations()
         {
-            var plan = new MigrationPlan<int, string?>(null, null);
+            var plan = new MigrationPlan<int, IntMigrationInfo>(null, null);
 
             plan.HasPendingMigrations.Should().BeFalse();
         }
@@ -25,9 +33,12 @@ namespace Synnotech.Migrations.Core.Tests
         [Theory]
         [InlineData(new[] { 1 }, "Pending migrations")]
         [InlineData(new int[] { }, "No pending migrations")]
-        public static void StringRepresentation(int[] migrations, string expectedText)
+        public static void StringRepresentation(int[] migrationVersions, string expectedText)
         {
-            var plan = new MigrationPlan<int, int?>(null, new List<int>(migrations));
+            var plan = new MigrationPlan<int, IntMigrationInfo>(
+                null,
+                migrationVersions.ConvertToPendingMigrations()
+                );
 
             plan.ToString().Should().Be(expectedText);
         }
@@ -35,10 +46,12 @@ namespace Synnotech.Migrations.Core.Tests
         [Theory]
         [InlineData(1, new[] { 2, 3, 4 })]
         [InlineData(null, new[] { 1, 2 })]
-        public static void CheckEquality(int? currentVersion, int[] migrationsToBeApplied)
+        public static void CheckEquality(int? currentVersion, int[] migrationVersions)
         {
-            var first = new MigrationPlan<int, int?>(currentVersion, new List<int>(migrationsToBeApplied));
-            var second = new MigrationPlan<int, int?>(currentVersion, new List<int>(migrationsToBeApplied));
+            var pendingMigrations = migrationVersions.ConvertToPendingMigrations();
+            IntMigrationInfo? migrationInfo = currentVersion;
+            var first = new MigrationPlan<int, IntMigrationInfo>(migrationInfo, pendingMigrations);
+            var second = new MigrationPlan<int, IntMigrationInfo>(migrationInfo, pendingMigrations.ToList());
 
             first.Should().Be(second);
             first.GetHashCode().Should().Be(second.GetHashCode());
@@ -46,16 +59,24 @@ namespace Synnotech.Migrations.Core.Tests
 
         [Theory]
         [MemberData(nameof(InequalityData))]
-        public static void CheckInequality(MigrationPlan<int, int?> first, MigrationPlan<int, int?> second)
-        {
+        public static void CheckInequality(MigrationPlan<int, IntMigrationInfo> first, MigrationPlan<int, IntMigrationInfo> second) =>
             first.Should().NotBe(second);
-        }
 
-        public static readonly TheoryData<MigrationPlan<int, int?>, MigrationPlan<int, int?>> InequalityData =
-            new()
+        public static readonly TheoryData<MigrationPlan<int, IntMigrationInfo>, MigrationPlan<int, IntMigrationInfo>> InequalityData =
+            new ()
             {
-                { new MigrationPlan<int, int?>(1, new List<int> { 2, 3, 4 }), new MigrationPlan<int, int?>(2, new List<int> { 3, 4 }) },
-                { new MigrationPlan<int, int?>(null, new List<int> { 1, 2 }), new MigrationPlan<int, int?>(1, new List<int> { 2, 3, 4 }) }
+                {
+                    new MigrationPlan<int, IntMigrationInfo>(1, new[] { 2, 3, 4 }.ConvertToPendingMigrations()),
+                    new MigrationPlan<int, IntMigrationInfo>(2, new [] { 3, 4 }.ConvertToPendingMigrations())
+                },
+                {
+                    new MigrationPlan<int, IntMigrationInfo>(null, new [] { 1, 2 }.ConvertToPendingMigrations()),
+                    new MigrationPlan<int, IntMigrationInfo>(1, new [] { 2, 3, 4 }.ConvertToPendingMigrations())
+                }
             };
+
+        private static List<PendingMigration<int>> ConvertToPendingMigrations(this int[] versions) =>
+            versions.Select(version => new PendingMigration<int>(version, DummyMigrationType))
+                    .ToList();
     }
 }

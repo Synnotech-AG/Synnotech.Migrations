@@ -24,7 +24,7 @@ namespace Synnotech.Migrations.Core
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
         /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
         public static List<PendingMigration<TMigrationVersion>>? DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(TMigrationVersion? latestVersion,
-                                                                                                                                            Assembly[] assembliesContainingMigrations)
+                                                                                                                                            params Assembly[] assembliesContainingMigrations)
             where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
             where TMigrationAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<TMigrationVersion>
         {

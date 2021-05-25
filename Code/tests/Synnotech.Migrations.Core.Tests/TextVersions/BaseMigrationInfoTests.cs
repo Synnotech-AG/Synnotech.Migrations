@@ -7,28 +7,9 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
 {
     public static class BaseMigrationInfoTests
     {
-        [Theory]
-        [MemberData(nameof(CompareData))]
-        public static void CompareWithMigrationVersionAttribute(MigrationInfoStub migrationInfo, MigrationVersionAttribute migrationVersion, int expectedResult) =>
-            migrationInfo.CompareTo(migrationVersion).Should().Be(expectedResult);
-
-        public static readonly TheoryData<MigrationInfoStub, MigrationVersionAttribute, int> CompareData =
-            new()
-            {
-                { new MigrationInfoStub { Version = "0.1.0" }, new MigrationVersionAttribute("0.2.0"), -1 },
-                { new MigrationInfoStub { Version = "1.0.0" }, new MigrationVersionAttribute("0.89.9"), 1 },
-                { new MigrationInfoStub { Version = "14.0.3" }, new MigrationVersionAttribute("14.0.3"), 0 }
-            };
-
         [Fact]
-        public static void AttributeIsNull()
-        {
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            Action act = () => new MigrationInfoStub().CompareTo(null!);
-
-            act.Should().Throw<ArgumentNullException>()
-               .And.ParamName.Should().Be("other");
-        }
+        public static void MustImplementIHasMigrationVersion() =>
+            typeof(BaseMigrationInfo).Should().Implement<IHasMigrationVersion<Version>>();
 
         [Theory]
         [MemberData(nameof(VersionData))]
@@ -38,7 +19,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         }
 
         public static readonly TheoryData<MigrationInfoStub, string?> VersionData =
-            new()
+            new ()
             {
                 { new MigrationInfoStub { Version = "2.3.4" }, "2.3.4" },
                 { new MigrationInfoStub(1) { Version = "1.0.0" }, "1" },
@@ -48,10 +29,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             };
 
         [Theory]
-        [InlineData("1.0.0")]
-        [InlineData("2.7.1")]
-        [InlineData("3.5.1")]
-        public static void GetInternalVersion(string version)
+        [MemberData(nameof(InternalVersionData))]
+        public static void TryGetInternalVersion(string version)
         {
             var migrationInfo = new MigrationInfoStub { Version = version };
 
@@ -62,6 +41,26 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             internalVersion.Should().Be(expectedVersion);
         }
 
+        [Theory]
+        [MemberData(nameof(InternalVersionData))]
+        public static void GetMigrationVersion(string version)
+        {
+            var migrationInfo = new MigrationInfoStub { Version = version };
+
+            var actualVersion = migrationInfo.GetMigrationVersion();
+
+            var expectedVersion = new Version(version);
+            actualVersion.Should().Be(expectedVersion);
+        }
+
+        public static readonly TheoryData<string> InternalVersionData =
+            new ()
+            {
+                "1.0.0",
+                "2.7.1",
+                "3.5.1"
+            };
+
         [Fact]
         public static void InternalVersionNotAvailable()
         {
@@ -69,6 +68,15 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
 
             result.Should().BeFalse();
             internalVersion.Should().BeNull();
+        }
+
+        [Fact]
+        public static void MigrationVersionNotSet()
+        {
+            Action act = () => new MigrationInfoStub { Name = "Foo" }.GetMigrationVersion();
+
+            act.Should().Throw<InvalidOperationException>()
+               .And.Message.Should().Be("Version is not set on migration info \"Foo\".");
         }
 
         [Theory]
