@@ -18,6 +18,9 @@ namespace Synnotech.Migrations.Core.TextVersions
         protected BaseMigration(string? name = null, int fieldCount = 3) : base(name) =>
             FieldCount = fieldCount.MustBeIn(Range.FromInclusive(1).ToInclusive(4), nameof(fieldCount));
 
+        /// <summary>
+        /// Gets the number of fields that will be returned when the version is converted to a string.
+        /// </summary>
         protected int FieldCount { get; }
 
         /// <inheritdoc />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Light.GuardClauses;
 
 namespace Synnotech.Migrations.Core
 {
@@ -7,12 +8,23 @@ namespace Synnotech.Migrations.Core
     /// Base class for migrations. Implements the <see cref="IHasMigrationVersion{TMigrationVersion}" /> interface
     /// and provides several default members like <see cref="Name" />.
     /// </summary>
-    /// <typeparam name="TMigrationVersion"></typeparam>
-    /// <typeparam name="TMigrationAttribute"></typeparam>
+    /// <typeparam name="TMigrationVersion">The type that represents a migration version. It must be equatable and comparable.</typeparam>
+    /// <typeparam name="TMigrationAttribute">
+    /// The type that represents the attribute being applied to migrations to indicate their version.
+    /// Must implement <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
+    /// </typeparam>
     public abstract class BaseMigration<TMigrationVersion, TMigrationAttribute> : IHasMigrationVersion<TMigrationVersion>
         where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
         where TMigrationAttribute : Attribute, IHasMigrationVersion<TMigrationVersion>
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="BaseMigration{TMigrationVersion,TMigrationAttribute}"/>.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the migration (optional). If the string is null, empty, or contains only white space,
+        /// then the simple type name (not the fully-qualified name) is used.
+        /// </param>
+        /// <exception cref="InvalidOperationException">Thrown when the migration attribute is not applied properly to the subclass.</exception>
         protected BaseMigration(string? name = null)
         {
             var type = GetType();
@@ -20,7 +32,7 @@ namespace Synnotech.Migrations.Core
             if (migrationAttribute == null)
                 throw new InvalidOperationException($"The {typeof(TMigrationAttribute).Name} is not applied to migration \"{type}\".");
             Version = migrationAttribute.GetMigrationVersion();
-            Name = name ?? type.Name;
+            Name = name.IsNullOrWhiteSpace() ? type.Name : name;
         }
 
         /// <summary>
@@ -52,7 +64,7 @@ namespace Synnotech.Migrations.Core
         public override int GetHashCode() => Version.GetHashCode();
 
         /// <summary>
-        /// Returns the string representation of the migration (version & name).
+        /// Returns the string representation of the migration (version and name).
         /// </summary>
         public override string ToString() => ConvertVersionToString() + " " + Name;
     }
