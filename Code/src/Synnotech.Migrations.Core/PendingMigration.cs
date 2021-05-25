@@ -43,6 +43,11 @@ namespace Synnotech.Migrations.Core
             MigrationVersion.Equals(other.MigrationVersion) && MigrationType == other.MigrationType;
 
         /// <summary>
+        /// Returns the version and type name of this pending migration.
+        /// </summary>
+        public override string ToString() => $"{MigrationVersion} {MigrationType.Name}";
+
+        /// <summary>
         /// Compares this instance to the other instance, using the <see cref="MigrationVersion" /> to determine the order.
         /// </summary>
         public int CompareTo(PendingMigration<TMigrationVersion> other) => MigrationVersion.CompareTo(other.MigrationVersion);

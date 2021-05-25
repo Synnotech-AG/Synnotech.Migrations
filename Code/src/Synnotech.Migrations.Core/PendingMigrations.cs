@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Light.GuardClauses;
-using Light.GuardClauses.Exceptions;
 
 namespace Synnotech.Migrations.Core
 {
@@ -19,17 +18,19 @@ namespace Synnotech.Migrations.Core
         /// <typeparam name="TMigration">The base class that identifies all migrations.</typeparam>
         /// <typeparam name="TMigrationAttribute">The type that represents the attribute being applied to migrations to indicate their version.</typeparam>
         /// <param name="latestVersion">The latest version that is already applied to the target system.</param>
-        /// <param name="assembliesContainingMigrations">The assemblies that will be searched for migration types.</param>
+        /// <param name="assembliesContainingMigrations">
+        /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
+        /// the calling assembly will be searched.
+        /// </param>
         /// <returns>A list of pending migrations that should be applied.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
-        /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
         /// <exception cref="MigrationException">Thrown when any migration type is found whose migration attribute is invalid.</exception>
         public static List<PendingMigration<TMigrationVersion>>? DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(TMigrationVersion? latestVersion,
                                                                                                                                             params Assembly[] assembliesContainingMigrations)
             where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
             where TMigrationAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<TMigrationVersion>
         {
-            assembliesContainingMigrations.MustNotBeNullOrEmpty(nameof(assembliesContainingMigrations));
+            if (assembliesContainingMigrations.IsNullOrEmpty())
+                assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
             var migrationBaseType = typeof(TMigration);
             var foundMigrationTypes = new Dictionary<TMigrationVersion, Type>();

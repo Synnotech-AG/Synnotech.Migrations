@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Light.GuardClauses;
-using Light.GuardClauses.Exceptions;
 
 namespace Synnotech.Migrations.Core
 {
@@ -15,11 +14,11 @@ namespace Synnotech.Migrations.Core
     /// <typeparam name="TMigrationVersion">The type that represents a migration version. It must be equatable and comparable.</typeparam>
     /// <typeparam name="TMigration">
     /// The base class that identifies all migrations. Must implement <see cref="IMigration{TContext}" /> and
-    /// <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
+    /// <see cref="IHasMigrationVersion{TMigrationVersion}" />.
     /// </typeparam>
     /// <typeparam name="TMigrationAttribute">
     /// The type that represents the attribute being applied to migrations to indicate their version.
-    /// Must implement <see cref="IMigrationAttribute"/> and <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
+    /// Must implement <see cref="IMigrationAttribute" /> and <see cref="IHasMigrationVersion{TMigrationVersion}" />.
     /// </typeparam>
     /// <typeparam name="TMigrationInfo">
     /// That type whose instances are stored in the target system to indicate which
@@ -33,7 +32,7 @@ namespace Synnotech.Migrations.Core
         where TMigrationInfo : IHasMigrationVersion<TMigrationVersion>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationEngine{TMigrationVersion,TMigration,TMigrationAttribute,TMigrationInfo,TMigrationContext}"/>.
+        /// Initializes a new instance of <see cref="MigrationEngine{TMigrationVersion,TMigration,TMigrationAttribute,TMigrationInfo,TMigrationContext}" />.
         /// </summary>
         /// <param name="sessionFactory">The factory that is used to create sessions which are used to access the target system.</param>
         /// <param name="migrationFactory">The factory that is used to instantiate migrations.</param>
@@ -67,25 +66,33 @@ namespace Synnotech.Migrations.Core
         /// Generates a plan that contains information about the latest applied migration on the target system
         /// and the migrations that need to be applied.
         /// </summary>
-        /// <param name="assembliesContainingMigrations">The assemblies that will be searched for migration types.</param>
+        /// <param name="assembliesContainingMigrations">
+        /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
+        /// the calling assembly will be searched.
+        /// </param>
         /// <returns>A plan that describes the latest applied migration and the pending migrations.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
-        /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
-        public virtual async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(params Assembly[] assembliesContainingMigrations)
+        public virtual Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(params Assembly[] assembliesContainingMigrations)
         {
-            assembliesContainingMigrations.MustNotBeNullOrEmpty(nameof(assembliesContainingMigrations));
+            if (assembliesContainingMigrations.IsNullOrEmpty())
+                assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
-            await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
+            return GetPlanInternalAsync(assembliesContainingMigrations);
 
-            var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
+            // ReSharper disable VariableHidesOuterVariable
+            async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanInternalAsync(Assembly[] assembliesContainingMigrations)
+                // ReSharper restore VariableHidesOuterVariable
+            {
+                await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
+                var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
 
-            var latestId = default(TMigrationVersion);
-            if (latestMigrationInfo != null)
-                latestId = latestMigrationInfo.GetMigrationVersion();
+                var latestId = default(TMigrationVersion);
+                if (latestMigrationInfo != null)
+                    latestId = latestMigrationInfo.GetMigrationVersion();
 
-            var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
-            return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
+                var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
+                return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
+            }
         }
 
         /// <summary>
@@ -97,16 +104,30 @@ namespace Synnotech.Migrations.Core
         /// This means that you must analyze the summary for errors (e.g. via <see cref="MigrationSummary{TMigrationInfo}.EnsureSuccess" />)
         /// to ensure that no errors occurred during a run.
         /// </summary>
-        /// <param name="now">The current time when the migration engine starts to execute. Please use a UTC time stamp if possible.</param>
-        /// <param name="assembliesContainingMigrations">The assemblies that will be searched for migration types.</param>
+        /// <param name="now">
+        /// The current time when the migration engine starts to execute (optional). Please use a UTC time stamp if possible. If
+        /// you do not provide a value, <see cref="DateTime.UtcNow" /> will be used.
+        /// </param>
+        /// <param name="assembliesContainingMigrations">
+        /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
+        /// the calling assembly will be searched.
+        /// </param>
         /// <returns>A summary of all migrations that have been applied in this run and an optional error that might have occurred during a migration.</returns>
-        /// /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
-        /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
-        public virtual async Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime now, params Assembly[] assembliesContainingMigrations)
+        public virtual Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime? now = null, params Assembly[] assembliesContainingMigrations)
         {
-            var migrationPlan = await GetPlanForNewMigrationsAsync(assembliesContainingMigrations);
-            return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
+            if (assembliesContainingMigrations.IsNullOrEmpty())
+                assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
+
+            return MigrateInternalAsync(now, assembliesContainingMigrations);
+
+            // ReSharper disable VariableHidesOuterVariable
+            async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now, Assembly[] assembliesContainingMigrations)
+                // ReSharper restore VariableHidesOuterVariable
+            {
+                var migrationPlan = await GetPlanForNewMigrationsAsync(assembliesContainingMigrations);
+                return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
+            }
         }
 
         /// <summary>
@@ -115,13 +136,17 @@ namespace Synnotech.Migrations.Core
         /// PLEASE NOTE: this method will not throw. You must check the resulting summary for errors that might have occurred.
         /// </summary>
         /// <param name="pendingMigrations">The list of migrations that should be applied.</param>
-        /// <param name="now">The current time when the migration engine starts to execute. Please use a UTC time stamp if possible.</param>
+        /// <param name="now">
+        /// The current time when the migration engine starts to execute (optional). Please use a UTC time stamp if possible. If
+        /// you do not provide a value, <see cref="DateTime.UtcNow" /> will be used.
+        /// </param>
         /// <returns>A summary of all migrations that have been applied in this run.</returns>
-        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<PendingMigration<TMigrationVersion>>? pendingMigrations, DateTime now)
+        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<PendingMigration<TMigrationVersion>>? pendingMigrations, DateTime? now = null)
         {
             if (pendingMigrations.IsNullOrEmpty())
                 return MigrationSummary<TMigrationInfo>.Empty;
 
+            var timeStamp = now ?? DateTime.UtcNow;
             var appliedMigrations = new List<TMigrationInfo>(pendingMigrations.Count);
             for (var i = 0; i < pendingMigrations.Count; i++)
             {
@@ -134,7 +159,7 @@ namespace Synnotech.Migrations.Core
                     migration = MigrationFactory.CreateMigration(pendingMigration.MigrationType);
                     session = await SessionFactory.CreateSessionForMigrationAsync(migration);
                     await migration.ApplyAsync(session.Context);
-                    var migrationInfo = CreateMigrationInfo(migration, now);
+                    var migrationInfo = CreateMigrationInfo(migration, timeStamp);
                     await session.StoreMigrationInfoAsync(migrationInfo);
                     await session.SaveChangesAsync();
                     appliedMigrations.Add(migrationInfo);

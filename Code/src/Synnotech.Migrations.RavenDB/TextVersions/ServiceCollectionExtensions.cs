@@ -22,6 +22,11 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// IMPORTANT: you should not call this method when you run a custom setup -
         /// please register your own types with the DI container in this case.
         /// </summary>
+        /// <param name="services">The service collection used to register types with the DI container.</param>
+        /// <param name="assembliesContainingMigrations">
+        /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
+        /// the calling assembly will be searched.
+        /// </param>
         public static IServiceCollection AddSynnotechMigrations(this IServiceCollection services, params Assembly[] assembliesContainingMigrations)
         {
             services.MustNotBeNull(nameof(services));
