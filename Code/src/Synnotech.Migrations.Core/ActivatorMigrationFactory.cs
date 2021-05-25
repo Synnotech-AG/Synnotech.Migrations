@@ -7,32 +7,11 @@ namespace Synnotech.Migrations.Core
     /// call the default constructor of a migration class.
     /// </summary>
     /// <typeparam name="TMigration">The base class used for migrations.</typeparam>
-    public sealed class ActivatorMigrationFactory<TMigration> : IMigrationFactory<TMigration>
+    public sealed class ActivatorMigrationFactory<TMigration> : BaseMigrationFactory<TMigration>
     {
         /// <summary>
-        /// Uses <see cref="Activator" /> to call the default constructor of the specified type.
+        /// Instantiates the given migration type using <see cref="Activator" />.
         /// </summary>
-        /// <param name="type">The migration type to be instantiated.</param>
-        /// <exception cref="MigrationException">
-        /// Thrown when any exception occurs during the creation process or when the instance
-        /// cannot be cast to <typeparamref name="TMigration" />.
-        /// </exception>
-        public TMigration CreateMigration(Type type)
-        {
-            object? instance;
-            try
-            {
-                instance = Activator.CreateInstance(type);
-            }
-            catch (Exception exception)
-            {
-                throw new MigrationException($"Could not instantiate migration type \"{type}\".", exception);
-            }
-
-            if (instance is not TMigration migration)
-                throw new MigrationException($"Type \"{type}\" cannot be cast to migration type \"{typeof(TMigration)}\".");
-
-            return migration;
-        }
+        protected override object InstantiateType(Type migrationType) => Activator.CreateInstance(migrationType);
     }
 }

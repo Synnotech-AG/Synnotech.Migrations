@@ -18,7 +18,11 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// </summary>
         /// <param name="migration">The migration that was executed.</param>
         /// <param name="appliedAt">The point in time when the migration was applied. Use <see cref="DateTime.UtcNow" /> if possible.</param>
-        public static MigrationInfo Create(Migration migration, DateTime appliedAt) =>
-            new() { Version = migration.VersionString, Name = migration.Name, AppliedAt = appliedAt };
+        public static MigrationInfo Create(Migration migration, DateTime appliedAt)
+        {
+            var migrationInfo = new MigrationInfo { Name = migration.Name, AppliedAt = appliedAt };
+            migrationInfo.SetInternalVersion(migration.Version);
+            return migrationInfo;
+        }
     }
 }

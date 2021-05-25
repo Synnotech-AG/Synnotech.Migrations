@@ -128,9 +128,10 @@ namespace Synnotech.Migrations.Core
                 var pendingMigration = pendingMigrations[i];
 
                 IMigrationSession<TMigrationContext, TMigrationInfo>? session = null;
+                TMigration? migration = default;
                 try
                 {
-                    var migration = MigrationFactory.CreateMigration(pendingMigration.MigrationType);
+                    migration = MigrationFactory.CreateMigration(pendingMigration.MigrationType);
                     session = await SessionFactory.CreateSessionForMigrationAsync(migration);
                     await migration.ApplyAsync(session.Context);
                     var migrationInfo = CreateMigrationInfo(migration, now);
@@ -145,6 +146,13 @@ namespace Synnotech.Migrations.Core
                 }
                 finally
                 {
+                    // ReSharper disable SuspiciousTypeConversion.Global -- clients of the library should be allowed to write disposable migrations
+                    if (migration is IAsyncDisposable asyncDisposableMigration)
+                        await asyncDisposableMigration.DisposeAsync();
+                    else if (migration is IDisposable disposableMigration)
+                        disposableMigration.Dispose();
+                    // ReSharper restore SuspiciousTypeConversion.Global
+
                     if (session != null)
                         await session.DisposeAsync();
                 }

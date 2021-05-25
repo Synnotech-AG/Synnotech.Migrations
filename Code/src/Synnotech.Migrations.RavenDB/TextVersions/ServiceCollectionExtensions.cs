@@ -1,0 +1,39 @@
+﻿using System;
+using System.Reflection;
+using Light.GuardClauses;
+using Microsoft.Extensions.DependencyInjection;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
+using Synnotech.Migrations.Core;
+using Synnotech.Migrations.Core.TextVersions;
+
+namespace Synnotech.Migrations.RavenDB.TextVersions
+{
+    /// <summary>
+    /// Provides methods to register the migration engine with the DI container.
+    /// </summary>
+    public static class ServiceCollectionExtensions
+    {
+        /// <summary>
+        /// Registers the default migration engine for Raven DB with the DI Container.
+        /// All instances (<see cref="MigrationEngine" />, <see cref="SessionFactory" />, and <see cref="MicrosoftDependencyInjectionMigrationFactory{TMigration}" />)
+        /// will be added with a transient lifetime. A registration for <see cref="IDocumentStore" /> must already be present
+        /// (usually with a singleton lifetime).
+        /// IMPORTANT: you should not call this method when you run a custom setup -
+        /// please register your own types with the DI container in this case.
+        /// </summary>
+        public static IServiceCollection AddSynnotechMigrations(this IServiceCollection services, params Assembly[] assembliesContainingMigrations)
+        {
+            services.MustNotBeNull(nameof(services));
+
+            if (assembliesContainingMigrations.IsNullOrEmpty())
+                assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
+
+            return services.AddTransient<ISessionFactory<MigrationInfo, Migration, IAsyncDocumentSession>, SessionFactory>()
+                           .AddTransient<IMigrationFactory<Migration>>(container => new MicrosoftDependencyInjectionMigrationFactory<Migration>(container))
+                           .AddTransient<Func<Migration, DateTime, MigrationInfo>>(_ => MigrationInfo.Create)
+                           .AddTransient<MigrationEngine>()
+                           .AddMigrationTypes<Migration, MigrationVersionAttribute>(assembliesContainingMigrations);
+        }
+    }
+}

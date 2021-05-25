@@ -23,6 +23,7 @@ namespace Synnotech.Migrations.Core
         /// <returns>A list of pending migrations that should be applied.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="assembliesContainingMigrations"/> is null.</exception>
         /// <exception cref="EmptyCollectionException">Thrown when <paramref name="assembliesContainingMigrations"/> is an empty array.</exception>
+        /// <exception cref="MigrationException">Thrown when any migration type is found whose migration attribute is invalid.</exception>
         public static List<PendingMigration<TMigrationVersion>>? DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(TMigrationVersion? latestVersion,
                                                                                                                                             params Assembly[] assembliesContainingMigrations)
             where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
@@ -56,17 +57,10 @@ namespace Synnotech.Migrations.Core
         {
             foreach (var type in assembly.ExportedTypes)
             {
-                if (!type.IsClass || type.IsAbstract || !type.DerivesFrom(migrationBaseType))
+                if (!type.CheckIfTypeIsMigration<TMigrationAttribute>(migrationBaseType, out var migrationAttribute))
                     continue;
-
-                var migrationAttribute = type.GetCustomAttribute<TMigrationAttribute>();
-                if (migrationAttribute == null)
-                    continue;
-
-                migrationAttribute.Validate(type);
 
                 var migrationVersion = migrationAttribute.GetMigrationVersion();
-
                 if (latestVersion != null && migrationVersion.CompareTo(latestVersion) <= 0)
                     continue;
 

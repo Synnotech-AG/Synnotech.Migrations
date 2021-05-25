@@ -11,11 +11,7 @@ Synntech.Migrations.RavenDB 0.7.0
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Include="..\Light.GuardClauses.cs" Link="Light.GuardClauses.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="RavenDB.Client" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+		<PackageReference Include="Synnotech.RavenDB" Version="1.0.0" />
 	</ItemGroup>
 </Project>
