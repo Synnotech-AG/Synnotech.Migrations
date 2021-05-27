@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using Raven.Client.Documents;
@@ -41,13 +42,14 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// This is done as string comparison and <see cref="Version" /> comparison leads to different results
         /// when a slot has more than one digit.
         /// </summary>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <exception cref="RavenException">Thrown when any communication error with the database occurs.</exception>
-        public async Task<TMigrationInfo?> GetLatestMigrationInfoAsync()
+        public async Task<TMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken = default)
         {
             var migrationInfos = await Session.Query<TMigrationInfo>()
                                               .OrderByDescending(migrationInfo => migrationInfo.AppliedAt)
                                               .Take(Take)
-                                              .ToListAsync();
+                                              .ToListAsync(cancellationToken);
             return migrationInfos.GetLatestMigrationInfo();
         }
     }

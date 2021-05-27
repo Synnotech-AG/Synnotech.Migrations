@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using Raven.Client.Documents;
@@ -24,14 +25,17 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// <summary>
         /// Creates the session that is used to retrieve the latest migration info from the target RavenDB database.
         /// </summary>
-        public ValueTask<IGetLatestMigrationInfoSession<MigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync() =>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask<IGetLatestMigrationInfoSession<MigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken = default) =>
             new (new RavenGetLatestMigrationInfoSession(Store.OpenAsyncSession()));
 
         /// <summary>
         /// Creates the session that is used to apply a migration and store the corresponding migration info in the target database.
         /// </summary>
         /// <param name="migration">This value is ignored.</param>
-        public ValueTask<IMigrationSession<IAsyncDocumentSession, MigrationInfo>> CreateSessionForMigrationAsync(Migration migration) =>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask<IMigrationSession<IAsyncDocumentSession, MigrationInfo>> CreateSessionForMigrationAsync(Migration migration,
+                                                                                                                 CancellationToken cancellationToken = default) =>
             new (new RavenMigrationSession(Store.OpenAsyncSession()));
     }
 }

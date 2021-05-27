@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
-using Raven.Client.Documents;
 using Raven.TestDriver;
 
 namespace Synnotech.Migrations.RavenDB.Tests

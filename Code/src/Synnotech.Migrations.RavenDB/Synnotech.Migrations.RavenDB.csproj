@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for RavenDB</Description>
 		<PackageReleaseNotes>
 Synntech.Migrations.RavenDB 0.7.0
@@ -12,6 +11,6 @@ Synntech.Migrations.RavenDB 0.7.0
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="Synnotech.RavenDB" Version="1.0.0" />
+		<PackageReference Include="Synnotech.RavenDB" Version="2.0.0" />
 	</ItemGroup>
 </Project>

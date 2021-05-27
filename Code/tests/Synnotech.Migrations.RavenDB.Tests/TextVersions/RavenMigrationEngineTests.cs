@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +59,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             await session.StoreAsync(new MigrationInfo { Id = "migrationInfos/1.0.0", Name = nameof(FirstMigration), Version = "1.0.0", AppliedAt = now.AddDays(-1) });
             await session.SaveChangesAsync();
 
-            var summary = await engine.MigrateAsync(now, GetType().Assembly);
+            var summary = await engine.MigrateAsync(now, new[] { GetType().Assembly });
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
             var expectedMigrationInfo = new MigrationInfo { Id = "migrationInfos/2.0.0", Name = nameof(SecondMigration), Version = "2.0.0", AppliedAt = now };
@@ -99,7 +100,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             await using var container = CreateContainer();
 
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
-            var migrationPlan = await migrationEngine.GetPlanForNewMigrationsAsync(typeof(RavenMigrationEngineTests).Assembly);
+            var migrationPlan = await migrationEngine.GetPlanForNewMigrationsAsync(new [] { typeof(RavenMigrationEngineTests).Assembly });
 
             var expectedPlan = new MigrationPlan<Version, MigrationInfo>(null, new List<PendingMigration<Version>> { ToPendingMigration(typeof(FirstMigration)), ToPendingMigration(typeof(SecondMigration)) });
             migrationPlan.Should().Be(expectedPlan);
@@ -119,15 +120,15 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
         [MigrationVersion("1.0.0")]
         public sealed class FirstMigration : Migration
         {
-            public override async Task ApplyAsync(IAsyncDocumentSession session) =>
-                await session.StoreAsync(new Entity { Value = "Foo" });
+            public override Task ApplyAsync(IAsyncDocumentSession session, CancellationToken cancellationToken = default) =>
+                session.StoreAsync(new Entity { Value = "Foo" }, cancellationToken);
         }
 
         [MigrationVersion("2.0.0")]
         public sealed class SecondMigration : Migration
         {
-            public override async Task ApplyAsync(IAsyncDocumentSession session) =>
-                await session.StoreAsync(new Entity { Value = "Bar" });
+            public override Task ApplyAsync(IAsyncDocumentSession session, CancellationToken cancellationToken = default) =>
+                session.StoreAsync(new Entity { Value = "Bar" }, cancellationToken);
         }
 
         public sealed class Entity

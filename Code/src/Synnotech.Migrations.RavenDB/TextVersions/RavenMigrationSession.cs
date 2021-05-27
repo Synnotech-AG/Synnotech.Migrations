@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
 using Synnotech.Migrations.Core;
@@ -28,7 +29,11 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// <summary>
         /// Stores the specified migration info in the database.
         /// </summary>
-        public ValueTask StoreMigrationInfoAsync(MigrationInfo migrationInfo) =>
-            new (Session.StoreAsync(migrationInfo, "migrationInfos" + Session.Advanced.DocumentStore.Conventions.IdentityPartsSeparator + migrationInfo.Version));
+        /// <param name="migrationInfo">The migration info object that will be stored in the database.</param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask StoreMigrationInfoAsync(MigrationInfo migrationInfo, CancellationToken cancellationToken = default) =>
+            new (Session.StoreAsync(migrationInfo,
+                                    "migrationInfos" + Session.Advanced.DocumentStore.Conventions.IdentityPartsSeparator + migrationInfo.Version,
+                                    cancellationToken));
     }
 }
