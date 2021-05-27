@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Synnotech.DatabaseAbstractions;
 
 namespace Synnotech.Migrations.Core
@@ -25,6 +26,8 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Stores the specified migration info in the target system.
         /// </summary>
-        ValueTask StoreMigrationInfoAsync(TMigrationInfo migrationInfo);
+        /// <param name="migrationInfo">The migration info object that will be stored in the database.</param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        ValueTask StoreMigrationInfoAsync(TMigrationInfo migrationInfo, CancellationToken cancellationToken = default);
     }
 }

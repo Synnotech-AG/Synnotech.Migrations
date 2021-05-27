@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Synnotech.DatabaseAbstractions;
 
 namespace Synnotech.Migrations.Core
@@ -14,6 +15,7 @@ namespace Synnotech.Migrations.Core
         /// Gets the latest migration info stored in the target system, or null if no
         /// migration has been applied.
         /// </summary>
-        Task<TMigrationInfo?> GetLatestMigrationInfoAsync();
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        Task<TMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken = default);
     }
 }

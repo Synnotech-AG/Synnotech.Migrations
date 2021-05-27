@@ -26,15 +26,15 @@ namespace Synnotech.Migrations.Core.TextVersions
         where TMigrationInfo : BaseMigrationInfo
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="MigrationEngine{TMigration,TMigrationInfo,TMigrationContext}"/>.
+        /// Initializes a new instance of <see cref="MigrationEngine{TMigration,TMigrationInfo,TMigrationContext}" />.
         /// </summary>
         /// <param name="sessionFactory">The factory that is used to create sessions which are used to access the target system.</param>
         /// <param name="migrationFactory">The factory that is used to instantiate migrations.</param>
         /// <param name="createMigrationInfo">The delegate that is used to instantiate migration infos.</param>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         public MigrationEngine(ISessionFactory<TMigrationInfo, TMigration, TMigrationContext> sessionFactory,
-                                  IMigrationFactory<TMigration> migrationFactory,
-                                  Func<TMigration, DateTime, TMigrationInfo> createMigrationInfo)
+                               IMigrationFactory<TMigration> migrationFactory,
+                               Func<TMigration, DateTime, TMigrationInfo> createMigrationInfo)
             : base(sessionFactory, migrationFactory, createMigrationInfo) { }
     }
 }

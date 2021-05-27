@@ -5,6 +5,7 @@
 		<TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
 		<PackageTags>Database Migrations</PackageTags>
 		<PackageIcon>synnotech-logo.png</PackageIcon>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageProjectUrl>https://github.com/Synnotech-AG/Synnotech.Migrations</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Synnotech-AG/Synnotech.Migrations.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>

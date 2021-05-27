@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 
@@ -70,22 +71,25 @@ namespace Synnotech.Migrations.Core
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
         /// the calling assembly will be searched.
         /// </param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <returns>A plan that describes the latest applied migration and the pending migrations.</returns>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
-        public virtual Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(params Assembly[] assembliesContainingMigrations)
+        public virtual Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(Assembly[]? assembliesContainingMigrations = null,
+                                                                                                           CancellationToken cancellationToken = default)
         {
             if (assembliesContainingMigrations.IsNullOrEmpty())
                 assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
-            return GetPlanForNewMigrationsInternal(assembliesContainingMigrations);
+            return GetPlanForNewMigrationsInternal(assembliesContainingMigrations, cancellationToken);
         }
 
-        private async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsInternal(Assembly[] assembliesContainingMigrations)
+        private async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsInternal(Assembly[] assembliesContainingMigrations,
+                                                                                                             CancellationToken cancellationToken = default)
         {
-            await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
-            var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
+            await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync(cancellationToken);
+            var latestMigrationInfo = await session.GetLatestMigrationInfoAsync(cancellationToken);
 
-            var latestId = default(TMigrationVersion);
+            var latestId = default(TMigrationVersion?);
             if (latestMigrationInfo != null)
                 latestId = latestMigrationInfo.GetMigrationVersion();
 
@@ -110,21 +114,26 @@ namespace Synnotech.Migrations.Core
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
         /// the calling assembly will be searched.
         /// </param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <returns>A summary of all migrations that have been applied in this run and an optional error that might have occurred during a migration.</returns>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
-        public virtual Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime? now = null, params Assembly[] assembliesContainingMigrations)
+        public virtual Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime? now = null,
+                                                                           Assembly[]? assembliesContainingMigrations = null,
+                                                                           CancellationToken cancellationToken = default)
         {
             if (assembliesContainingMigrations.IsNullOrEmpty())
                 assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
-            return MigrateInternalAsync(now, assembliesContainingMigrations);
+            return MigrateInternalAsync(now, assembliesContainingMigrations, cancellationToken);
 
             // ReSharper disable VariableHidesOuterVariable
-            async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now, Assembly[] assembliesContainingMigrations)
+            async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now,
+                                                                              Assembly[] assembliesContainingMigrations,
+                                                                              CancellationToken cancellationToken)
             // ReSharper restore VariableHidesOuterVariable
             {
-                var migrationPlan = await GetPlanForNewMigrationsInternal(assembliesContainingMigrations);
-                return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
+                var migrationPlan = await GetPlanForNewMigrationsInternal(assembliesContainingMigrations, cancellationToken);
+                return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now, cancellationToken);
             }
         }
 
@@ -138,8 +147,11 @@ namespace Synnotech.Migrations.Core
         /// The current time when the migration engine starts to execute (optional). Please use a UTC time stamp if possible. If
         /// you do not provide a value, <see cref="DateTime.UtcNow" /> will be used.
         /// </param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <returns>A summary of all migrations that have been applied in this run.</returns>
-        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<PendingMigration<TMigrationVersion>>? pendingMigrations, DateTime? now = null)
+        public virtual async Task<MigrationSummary<TMigrationInfo>> ApplyMigrationsAsync(List<PendingMigration<TMigrationVersion>>? pendingMigrations,
+                                                                                         DateTime? now = null,
+                                                                                         CancellationToken cancellationToken = default)
         {
             if (pendingMigrations.IsNullOrEmpty())
                 return MigrationSummary<TMigrationInfo>.Empty;
@@ -155,11 +167,11 @@ namespace Synnotech.Migrations.Core
                 try
                 {
                     migration = MigrationFactory.CreateMigration(pendingMigration.MigrationType);
-                    session = await SessionFactory.CreateSessionForMigrationAsync(migration);
-                    await migration.ApplyAsync(session.Context);
+                    session = await SessionFactory.CreateSessionForMigrationAsync(migration, cancellationToken);
+                    await migration.ApplyAsync(session.Context, cancellationToken);
                     var migrationInfo = CreateMigrationInfo(migration, timeStamp);
-                    await session.StoreMigrationInfoAsync(migrationInfo);
-                    await session.SaveChangesAsync();
+                    await session.StoreMigrationInfoAsync(migrationInfo, cancellationToken);
+                    await session.SaveChangesAsync(cancellationToken);
                     appliedMigrations.Add(migrationInfo);
                 }
                 catch (Exception exception)

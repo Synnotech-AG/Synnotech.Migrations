@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Synnotech.Migrations.Core
@@ -18,13 +19,15 @@ namespace Synnotech.Migrations.Core
         /// <summary>
         /// Creates a new session that will be used to retrieve the latest applied migration info.
         /// </summary>
-        ValueTask<IGetLatestMigrationInfoSession<TMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync();
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        ValueTask<IGetLatestMigrationInfoSession<TMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new session that will be used to execute the specified migration.
         /// </summary>
         /// <param name="migration">The migration to be executed.</param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
-        ValueTask<IMigrationSession<TContext, TMigrationInfo>> CreateSessionForMigrationAsync(TMigration migration);
+        ValueTask<IMigrationSession<TContext, TMigrationInfo>> CreateSessionForMigrationAsync(TMigration migration, CancellationToken cancellationToken = default);
     }
 }

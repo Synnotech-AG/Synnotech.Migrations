@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Synnotech.Migrations.Core
 {
@@ -24,6 +25,7 @@ namespace Synnotech.Migrations.Core
         /// occurred during the migration.
         /// </summary>
         /// <param name="context">The context that holds all structures necessary to perform the migration.</param>
-        Task ApplyAsync(TContext context);
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        Task ApplyAsync(TContext context, CancellationToken cancellationToken = default);
     }
 }
