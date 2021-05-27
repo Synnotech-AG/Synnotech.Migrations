@@ -77,22 +77,20 @@ namespace Synnotech.Migrations.Core
             if (assembliesContainingMigrations.IsNullOrEmpty())
                 assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
-            return GetPlanInternalAsync(assembliesContainingMigrations);
+            return GetPlanForNewMigrationsInternal(assembliesContainingMigrations);
+        }
 
-            // ReSharper disable VariableHidesOuterVariable
-            async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanInternalAsync(Assembly[] assembliesContainingMigrations)
-                // ReSharper restore VariableHidesOuterVariable
-            {
-                await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
-                var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
+        private async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsInternal(Assembly[] assembliesContainingMigrations)
+        {
+            await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync();
+            var latestMigrationInfo = await session.GetLatestMigrationInfoAsync();
 
-                var latestId = default(TMigrationVersion);
-                if (latestMigrationInfo != null)
-                    latestId = latestMigrationInfo.GetMigrationVersion();
+            var latestId = default(TMigrationVersion);
+            if (latestMigrationInfo != null)
+                latestId = latestMigrationInfo.GetMigrationVersion();
 
-                var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
-                return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
-            }
+            var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
+            return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
         }
 
         /// <summary>
@@ -123,9 +121,9 @@ namespace Synnotech.Migrations.Core
 
             // ReSharper disable VariableHidesOuterVariable
             async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now, Assembly[] assembliesContainingMigrations)
-                // ReSharper restore VariableHidesOuterVariable
+            // ReSharper restore VariableHidesOuterVariable
             {
-                var migrationPlan = await GetPlanForNewMigrationsAsync(assembliesContainingMigrations);
+                var migrationPlan = await GetPlanForNewMigrationsInternal(assembliesContainingMigrations);
                 return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now);
             }
         }
