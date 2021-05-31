@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.EmbeddedResources;
 using Light.GuardClauses;
+using LinqToDB.Data;
 
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
@@ -21,17 +23,15 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptName"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="scriptName"/> is an empty string or contains only white space.</exception>
-        protected EmbeddedScriptMigration(string scriptName)
-        {
+        protected EmbeddedScriptMigration(string scriptName) =>
             ScriptName = scriptName.MustNotBeNullOrWhiteSpace(nameof(scriptName));
-        }
 
         private string ScriptName { get; }
 
         /// <summary>
         /// Executes the embedded SQL script against the target database.
         /// </summary>
-        public sealed override Task ApplyAsync(MigrationSession session) =>
-            session.ExecuteScriptAsync(this.GetEmbeddedResource(ScriptName));
+        public sealed override Task ApplyAsync(DataConnection dataConnection, CancellationToken cancellationToken = default) =>
+            dataConnection.ExecuteAsync(this.GetEmbeddedResource(ScriptName), cancellationToken);
     }
 }

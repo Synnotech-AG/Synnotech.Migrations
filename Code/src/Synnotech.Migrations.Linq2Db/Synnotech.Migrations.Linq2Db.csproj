@@ -11,12 +11,10 @@ Synntech.Migrations.Linq2Db 0.7.0
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Include="..\Light.GuardClauses.cs" Link="Light.GuardClauses.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
 		<PackageReference Include="linq2db" Version="3.3.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
 		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
+		<PackageReference Include="Synnotech.Linq2Db" Version="3.0.0" />
 	</ItemGroup>
 </Project>

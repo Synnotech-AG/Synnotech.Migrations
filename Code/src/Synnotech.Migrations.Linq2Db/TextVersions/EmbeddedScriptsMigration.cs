@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.EmbeddedResources;
 using Light.GuardClauses;
+using LinqToDB.Data;
 
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
@@ -18,21 +20,19 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <param name="scriptNames">The names of the scripts that will be executed. The order matters (of course!).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptNames"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="scriptNames"/> is empty.</exception>
-        protected EmbeddedScriptsMigration(params string[] scriptNames)
-        {
+        protected EmbeddedScriptsMigration(params string[] scriptNames) =>
             ScriptNames = scriptNames.MustNotBeNullOrEmpty(nameof(scriptNames));
-        }
 
         private string[] ScriptNames { get; }
 
         /// <summary>
         /// Executes the embedded SQL scripts against the target database.
         /// </summary>
-        public sealed override async Task ApplyAsync(MigrationSession session)
+        public sealed override async Task ApplyAsync(DataConnection dataConnection, CancellationToken cancellationToken = default)
         {
             foreach (var scriptName in ScriptNames)
             {
-                await session.ExecuteScriptAsync(this.GetEmbeddedResource(scriptName));
+                await dataConnection.ExecuteAsync(this.GetEmbeddedResource(scriptName), cancellationToken);
             }
         }
     }

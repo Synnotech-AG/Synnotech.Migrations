@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using LinqToDB.Data;
@@ -9,7 +11,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     /// <summary>
     /// Represents the default factory for creating Linq2Db migration sessions that support text versions.
     /// </summary>
-    public sealed class SessionFactory : ISessionFactory<MigrationSession, Migration>
+    public sealed class SessionFactory : ISessionFactory<MigrationInfo, Migration, DataConnection>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="SessionFactory"/>.
@@ -22,27 +24,30 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         private Func<DataConnection> CreateDataConnection { get; }
 
         /// <summary>
-        /// Creates a new session for the specified migration. If <see cref="Migration.IsRequiringTransaction"/>
-        /// is true, then a serializable transaction will be created.
+        /// Creates the session that is used to retrieve the latest migration info from the target database.
         /// </summary>
-        /// <param name="migration">The migration the session is created for.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
-        public async ValueTask<MigrationSession> CreateSessionForMigrationAsync(Migration migration)
-        {
-            migration.MustNotBeNull(nameof(migration));
-            var session = new MigrationSession(CreateDataConnection());
-            if (migration.IsRequiringTransaction)
-                await session.BeginTransactionAsync();
-            return session;
-        }
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask<IGetLatestMigrationInfoSession<MigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken = default) =>
+            new (new LinqToDbGetLatestMigrationInfoSession(CreateDataConnection()));
 
         /// <summary>
-        /// Creates a new session without a transaction.
+        /// Creates the session that is used to apply a migration and store the corresponding migration info in the target database.
         /// </summary>
-        public ValueTask<MigrationSession> CreateSessionForRetrievingLatestMigrationInfoAsync()
+        /// <param name="migration">
+        /// The migration to be executed. <see cref="Migration.IsRequiringTransaction"/> is used to determine if a transaction
+        /// is started on the data connection.
+        /// </param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
+        public async ValueTask<IMigrationSession<DataConnection, MigrationInfo>> CreateSessionForMigrationAsync(Migration migration,
+                                                                                                                CancellationToken cancellationToken = default)
         {
-            var session = new MigrationSession(CreateDataConnection());
-            return new (session);
+            migration.MustNotBeNull(nameof(migration));
+
+            var dataConnection = CreateDataConnection();
+            if (migration.IsRequiringTransaction)
+                await dataConnection.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            return new LinqToDbMigrationSession(dataConnection);
         }
     }
 }
