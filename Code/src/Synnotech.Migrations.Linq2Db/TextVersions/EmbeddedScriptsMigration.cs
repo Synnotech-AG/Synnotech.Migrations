@@ -18,8 +18,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Initializes a new instance of <see cref="EmbeddedScriptsMigration" />
         /// </summary>
         /// <param name="scriptNames">The names of the scripts that will be executed. The order matters (of course!).</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptNames"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="scriptNames"/> is empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptNames" /> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="scriptNames" /> is empty.</exception>
         protected EmbeddedScriptsMigration(params string[] scriptNames) =>
             ScriptNames = scriptNames.MustNotBeNullOrEmpty(nameof(scriptNames));
 

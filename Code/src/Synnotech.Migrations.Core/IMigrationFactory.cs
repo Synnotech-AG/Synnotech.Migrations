@@ -12,7 +12,7 @@ namespace Synnotech.Migrations.Core
         /// Creates a new migration instance.
         /// </summary>
         /// <param name="type">The type that represents the migration.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="type" /> is null.</exception>
         TMigration CreateMigration(Type type);
     }
 }

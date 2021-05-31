@@ -9,7 +9,7 @@ using Synnotech.RavenDB;
 namespace Synnotech.Migrations.RavenDB.TextVersions
 {
     /// <summary>
-    /// Represents the session that is used to apply a migration and store the corresponding migration info. 
+    /// Represents the session that is used to apply a migration and store the corresponding migration info.
     /// </summary>
     /// <typeparam name="TMigrationInfo">The type that represents a migration info. It must derive from <see cref="BaseMigrationInfo" />.</typeparam>
     public class RavenMigrationSession<TMigrationInfo> : AsyncSession, IMigrationSession<IAsyncDocumentSession, TMigrationInfo>

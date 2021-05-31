@@ -21,8 +21,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// The name of the embedded file that contains the SQL script. You must only provide
         /// the name of the file, the namespace will be derived automatically from your deriving class.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="scriptName"/> is an empty string or contains only white space.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="scriptName" /> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="scriptName" /> is an empty string or contains only white space.</exception>
         protected EmbeddedScriptMigration(string scriptName) =>
             ScriptName = scriptName.MustNotBeNullOrWhiteSpace(nameof(scriptName));
 

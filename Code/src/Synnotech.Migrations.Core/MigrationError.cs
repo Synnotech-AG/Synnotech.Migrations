@@ -27,6 +27,13 @@ namespace Synnotech.Migrations.Core
         public TMigrationVersion ErroneousVersion { get; }
 
         /// <summary>
+        /// Checks if the specified object is a migration error and equal to this instance.
+        /// This is true when the version represents the same migration as the other instance.
+        /// </summary>
+        public bool Equals(MigrationError<TMigrationVersion>? other) =>
+            other is not null && ErroneousVersion.Equals(other.ErroneousVersion);
+
+        /// <summary>
         /// Gets the erroneous version as a string.
         /// </summary>
         public string ErroneousVersionText => ErroneousVersion.ToString();
@@ -43,13 +50,6 @@ namespace Synnotech.Migrations.Core
         [DoesNotReturn]
         public void Rethrow() =>
             throw new MigrationException($"Could not execute migration \"{ErroneousVersion}\" successfully - please see the inner exception for details", Exception);
-
-        /// <summary>
-        /// Checks if the specified object is a migration error and equal to this instance.
-        /// This is true when the version represents the same migration as the other instance.
-        /// </summary>
-        public bool Equals(MigrationError<TMigrationVersion>? other) =>
-            other is not null && ErroneousVersion.Equals(other.ErroneousVersion);
 
         /// <summary>
         /// Checks if the specified object is a migration error and equal to this instance.

@@ -2,7 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Light.GuardClauses;
 using Light.GuardClauses.FrameworkExtensions;
+#if NETSTANDARD2_1
 using Range = Light.GuardClauses.Range;
+#endif
 
 namespace Synnotech.Migrations.Core.TextVersions
 {
@@ -13,7 +15,6 @@ namespace Synnotech.Migrations.Core.TextVersions
     /// serialization to document or relational databases with different frameworks.
     /// </summary>
     public abstract class BaseMigrationInfo : IHasMigrationVersion<Version>
-
     {
         private readonly int _fieldCount;
         private string? _name;

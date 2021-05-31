@@ -65,9 +65,9 @@ namespace Synnotech.Migrations.Core
             return true;
 
             static bool CheckIfCurrentVersionsAreEqual(TMigrationInfo? x, TMigrationInfo? y) =>
-            x is null ?
-                y is null :
-                y is not null && x.GetMigrationVersion().Equals(y.GetMigrationVersion());
+                x is null ?
+                    y is null :
+                    y is not null && x.GetMigrationVersion().Equals(y.GetMigrationVersion());
         }
 
         /// <summary>

@@ -14,10 +14,10 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     public sealed class SessionFactory : ISessionFactory<MigrationInfo, Migration, DataConnection>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="SessionFactory"/>.
+        /// Initializes a new instance of <see cref="SessionFactory" />.
         /// </summary>
         /// <param name="createDataConnection">The factory that creates a new Linq2Db data connection.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="createDataConnection"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="createDataConnection" /> is null.</exception>
         public SessionFactory(Func<DataConnection> createDataConnection) =>
             CreateDataConnection = createDataConnection.MustNotBeNull(nameof(createDataConnection));
 
@@ -42,11 +42,11 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Creates the session that is used to apply a migration and store the corresponding migration info in the target database.
         /// </summary>
         /// <param name="migration">
-        /// The migration to be executed. <see cref="Migration.IsRequiringTransaction"/> is used to determine if a transaction
+        /// The migration to be executed. <see cref="Migration.IsRequiringTransaction" /> is used to determine if a transaction
         /// is started on the data connection.
         /// </param>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration" /> is null.</exception>
         public async ValueTask<IMigrationSession<DataConnection, MigrationInfo>> CreateSessionForMigrationAsync(Migration migration,
                                                                                                                 CancellationToken cancellationToken = default)
         {

@@ -38,7 +38,7 @@ namespace Synnotech.Migrations.Core.Tests
             var plan = new MigrationPlan<int, IntMigrationInfo>(
                 null,
                 migrationVersions.ConvertToPendingMigrations()
-                );
+            );
 
             plan.ToString().Should().Be(expectedText);
         }
@@ -67,11 +67,11 @@ namespace Synnotech.Migrations.Core.Tests
             {
                 {
                     new MigrationPlan<int, IntMigrationInfo>(1, new[] { 2, 3, 4 }.ConvertToPendingMigrations()),
-                    new MigrationPlan<int, IntMigrationInfo>(2, new [] { 3, 4 }.ConvertToPendingMigrations())
+                    new MigrationPlan<int, IntMigrationInfo>(2, new[] { 3, 4 }.ConvertToPendingMigrations())
                 },
                 {
-                    new MigrationPlan<int, IntMigrationInfo>(null, new [] { 1, 2 }.ConvertToPendingMigrations()),
-                    new MigrationPlan<int, IntMigrationInfo>(1, new [] { 2, 3, 4 }.ConvertToPendingMigrations())
+                    new MigrationPlan<int, IntMigrationInfo>(null, new[] { 1, 2 }.ConvertToPendingMigrations()),
+                    new MigrationPlan<int, IntMigrationInfo>(1, new[] { 2, 3, 4 }.ConvertToPendingMigrations())
                 }
             };
 

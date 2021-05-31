@@ -27,7 +27,7 @@ namespace Synnotech.Migrations.Core
         /// </summary>
         /// <param name="migration">The migration to be executed.</param>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="migration" /> is null.</exception>
         ValueTask<IMigrationSession<TContext, TMigrationInfo>> CreateSessionForMigrationAsync(TMigration migration, CancellationToken cancellationToken = default);
     }
 }

@@ -100,7 +100,7 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             await using var container = CreateContainer();
 
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
-            var migrationPlan = await migrationEngine.GetPlanForNewMigrationsAsync(new [] { typeof(RavenMigrationEngineTests).Assembly });
+            var migrationPlan = await migrationEngine.GetPlanForNewMigrationsAsync(new[] { typeof(RavenMigrationEngineTests).Assembly });
 
             var expectedPlan = new MigrationPlan<Version, MigrationInfo>(null, new List<PendingMigration<Version>> { ToPendingMigration(typeof(FirstMigration)), ToPendingMigration(typeof(SecondMigration)) });
             migrationPlan.Should().Be(expectedPlan);

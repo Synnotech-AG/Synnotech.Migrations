@@ -25,7 +25,7 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
 
         /// <summary>
         /// Executes the migration. Interactions with the target system can be performed
-        /// using the <paramref name="session"/>.
+        /// using the <paramref name="session" />.
         /// IMPORTANT: you usually should not call 'session.SaveChangesAsync' or something
         /// similar as this is handled by the migration engine.
         /// Furthermore, WaitForIndexesOnSaveChanges is enabled by default, so you can safely query

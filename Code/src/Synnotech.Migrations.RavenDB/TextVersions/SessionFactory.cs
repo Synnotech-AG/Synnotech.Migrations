@@ -17,7 +17,7 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// Initializes a new instance of <see cref="SessionFactory" />.
         /// </summary>
         /// <param name="store">The RavenDB document store that is used to create session instances.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="store"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="store" /> is null.</exception>
         public SessionFactory(IDocumentStore store) => Store = store.MustNotBeNull(nameof(store));
 
         private IDocumentStore Store { get; }

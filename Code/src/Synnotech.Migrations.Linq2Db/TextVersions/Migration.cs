@@ -9,8 +9,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
     /// Represents the default abstraction of a migration applied via Linq2Db. This type
-    /// uses <see cref="System.Version" /> to identify and sort migrations. As the context type,
-    /// <see cref="MigrationSession"/> is used.
+    /// uses <see cref="Version" /> to identify and sort migrations. As the context type,
+    /// <see cref="DataConnection" /> is used.
     /// </summary>
     public abstract class Migration : BaseMigration, IMigration<DataConnection>
     {
@@ -23,8 +23,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// then the simple type name (not the fully-qualified name) is used.
         /// </param>
         /// <param name="fieldCount">The number of components included when the version of this migration is turned into a string. The default is 3 (semantic versions).</param>
-        /// <exception cref="InvalidOperationException">Thrown when the deriving class is not decorated with the <see cref="MigrationVersionAttribute"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="fieldCount"/> is not in between 1 and 4.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the deriving class is not decorated with the <see cref="MigrationVersionAttribute" />.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="fieldCount" /> is not in between 1 and 4.</exception>
         protected Migration(string? name = null, int fieldCount = 3) : base(name, fieldCount) { }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// using the specified session.
         /// IMPORTANT: you usually should not call 'dataConnection.CommitTransactionAsync' or something
         /// similar as this is handled by the migration engine.
-        /// You can set <see cref="IsRequiringTransaction"/> to false to handle transactions yourself
+        /// You can set <see cref="IsRequiringTransaction" /> to false to handle transactions yourself
         /// or execute the migration without a transaction.
         /// </summary>
         /// <param name="dataConnection">The Linq2DB data connection that is used to interact with the target database.</param>

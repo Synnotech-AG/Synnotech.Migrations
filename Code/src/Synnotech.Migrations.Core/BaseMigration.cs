@@ -11,14 +11,14 @@ namespace Synnotech.Migrations.Core
     /// <typeparam name="TMigrationVersion">The type that represents a migration version. It must be equatable and comparable.</typeparam>
     /// <typeparam name="TMigrationAttribute">
     /// The type that represents the attribute being applied to migrations to indicate their version.
-    /// Must implement <see cref="IHasMigrationVersion{TMigrationVersion}"/>.
+    /// Must implement <see cref="IHasMigrationVersion{TMigrationVersion}" />.
     /// </typeparam>
     public abstract class BaseMigration<TMigrationVersion, TMigrationAttribute> : IHasMigrationVersion<TMigrationVersion>
         where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
         where TMigrationAttribute : Attribute, IHasMigrationVersion<TMigrationVersion>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="BaseMigration{TMigrationVersion,TMigrationAttribute}"/>.
+        /// Initializes a new instance of <see cref="BaseMigration{TMigrationVersion,TMigrationAttribute}" />.
         /// </summary>
         /// <param name="name">
         /// The name of the migration (optional). If the string is null, empty, or contains only white space,

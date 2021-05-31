@@ -1,6 +1,8 @@
 ﻿using System;
 using Light.GuardClauses;
+#if NETSTANDARD2_1
 using Range = Light.GuardClauses.Range;
+#endif
 
 namespace Synnotech.Migrations.Core.TextVersions
 {

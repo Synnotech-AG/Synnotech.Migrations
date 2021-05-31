@@ -15,7 +15,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         }
 
         public static readonly TheoryData<TestMigration, TestMigration?, bool> EqualityData =
-            new()
+            new ()
             {
                 { new Migration1(), new Migration2(), false },
                 { new Migration3(), new Migration3(), true },
@@ -42,7 +42,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         }
 
         public static readonly TheoryData<TestMigration> HashCodeData =
-            new()
+            new ()
             {
                 new Migration1(),
                 new Migration2(),
@@ -54,7 +54,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         [MigrationVersion("1.0.0")]
         public sealed class Migration1 : TestMigration
         {
-            public static readonly Migration1 Instance = new();
+            public static readonly Migration1 Instance = new ();
         }
 
         [MigrationVersion("2.0.0")]

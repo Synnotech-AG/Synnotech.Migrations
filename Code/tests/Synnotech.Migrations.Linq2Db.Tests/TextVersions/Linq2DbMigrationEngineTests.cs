@@ -108,6 +108,7 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
                     Output.WriteLine(appliedMigration.ToString());
                 }
             }
+
             Output.WriteLine(string.Empty);
 
             if (summary.TryGetError(out var error))

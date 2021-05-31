@@ -130,7 +130,7 @@ namespace Synnotech.Migrations.Core
             async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now,
                                                                               Assembly[] assembliesContainingMigrations,
                                                                               CancellationToken cancellationToken)
-            // ReSharper restore VariableHidesOuterVariable
+                // ReSharper restore VariableHidesOuterVariable
             {
                 var migrationPlan = await GetPlanForNewMigrationsInternal(assembliesContainingMigrations, cancellationToken);
                 return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now, cancellationToken);

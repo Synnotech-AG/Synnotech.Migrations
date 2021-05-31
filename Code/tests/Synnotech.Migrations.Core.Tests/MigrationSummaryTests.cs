@@ -54,7 +54,7 @@ namespace Synnotech.Migrations.Core.Tests
             first.Should().NotBe(second);
 
         public static readonly TheoryData<MigrationSummary<int>, MigrationSummary<int>> InequalityData =
-            new()
+            new ()
             {
                 { new MigrationSummary<int>(new List<int> { 1, 2, 3 }), new MigrationSummary<int>(new List<int> { 2, 3, 4 }) },
                 { new MigrationSummary<int>(new MigrationError<int>(1, new Exception()), null), new MigrationSummary<int>() }

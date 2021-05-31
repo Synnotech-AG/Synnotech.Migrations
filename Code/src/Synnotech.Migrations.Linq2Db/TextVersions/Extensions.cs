@@ -9,7 +9,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     public static class Extensions
     {
         /// <summary>
-        /// Registers the mappings for the <see cref="MigrationInfo"/> instance.
+        /// Registers the mappings for the <see cref="MigrationInfo" /> instance.
         /// </summary>
         /// <param name="builder">The LinqToDB builder that is used to create mappings from model classes to database tables.</param>
         /// <param name="tableName">The name of the table that will hold records for migration infos (optional). Defaults</param>
