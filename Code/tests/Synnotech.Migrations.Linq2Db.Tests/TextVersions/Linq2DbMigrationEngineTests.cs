@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LinqToDB;
@@ -29,7 +30,7 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
 
             var now = DateTime.UtcNow;
-            var summary = await migrationEngine.MigrateAsync(GetType().Assembly, now);
+            var summary = await migrationEngine.MigrateAsync(now);
             LogSummary(summary);
 
             await using var dataConnection = container.GetRequiredService<DataConnection>();
@@ -56,14 +57,15 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
 
             var now = DateTime.UtcNow;
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
-            var summary = await migrationEngine.MigrateAsync(GetType().Assembly, now);
+            var summary = await migrationEngine.MigrateAsync(now);
             LogSummary(summary);
 
             var expectedMigration = new List<MigrationInfo>
             {
                 new () { Id = 2, Name = nameof(AddFirstMasterDataEntry), Version = "0.2.0", AppliedAt = now }
             };
-            summary.AppliedMigrations.Should().BeEquivalentTo(expectedMigration);
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            appliedMigrations.Should().BeEquivalentTo(expectedMigration);
             summary.EnsureSuccess();
         }
 
@@ -80,10 +82,11 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
             }
 
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
-            var summary = await migrationEngine.MigrateAsync(GetType().Assembly, now);
+            var summary = await migrationEngine.MigrateAsync(now);
             LogSummary(summary);
 
-            summary.AppliedMigrations.Should().BeNullOrEmpty();
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
+            appliedMigrations.Should().BeNull();
             summary.EnsureSuccess();
         }
 
@@ -121,7 +124,7 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
     [MigrationVersion("0.2.0")]
     public sealed class AddFirstMasterDataEntry : Migration
     {
-        public override Task ApplyAsync(MigrationSession session) =>
-            session.DataConnection.InsertAsync(new MasterData());
+        public override Task ApplyAsync(DataConnection dataConnection, CancellationToken cancellationToken = default) =>
+            dataConnection.InsertAsync(new MasterData(), token: cancellationToken);
     }
 }
