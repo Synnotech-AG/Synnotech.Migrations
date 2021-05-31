@@ -24,11 +24,19 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         private Func<DataConnection> CreateDataConnection { get; }
 
         /// <summary>
+        /// Gets or sets the number of entries that the <see cref="LinqToDbGetLatestMigrationInfoSession" /> will
+        /// load from the database to determine the newest migrations. The default value is 100.
+        /// This is done as string comparison and <see cref="Version" /> comparison leads to different results
+        /// when a slot has more than one digit. The actual newest version is determined on the client-side.
+        /// </summary>
+        public int Take { get; set; } = 100;
+
+        /// <summary>
         /// Creates the session that is used to retrieve the latest migration info from the target database.
         /// </summary>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         public ValueTask<IGetLatestMigrationInfoSession<MigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken = default) =>
-            new (new LinqToDbGetLatestMigrationInfoSession(CreateDataConnection()));
+            new (new LinqToDbGetLatestMigrationInfoSession(CreateDataConnection(), Take));
 
         /// <summary>
         /// Creates the session that is used to apply a migration and store the corresponding migration info in the target database.

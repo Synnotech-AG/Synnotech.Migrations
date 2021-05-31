@@ -24,14 +24,14 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// </summary>
         /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
         /// <param name="take">
-        /// The amount of migration infos that are retrieved from the database (ordered by AppliedAt). The default value is 50.
+        /// The amount of migration infos that are retrieved from the database (ordered by AppliedAt). The default value is 100.
         /// The actual latest migration info is determined in-memory using the <see cref="Version" /> object.
         /// This is done because string comparison and <see cref="Version" /> comparison leads to different results
         /// when a slot has more than one digit.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="take" /> is equal to or less than 0.</exception>
-        public LinqToDbGetLatestMigrationInfoSession(DataConnection dataConnection, int take = 50) : base(dataConnection) =>
+        public LinqToDbGetLatestMigrationInfoSession(DataConnection dataConnection, int take = 100) : base(dataConnection) =>
             Take = take.MustBeGreaterThan(0, nameof(take));
 
         private int Take { get; }

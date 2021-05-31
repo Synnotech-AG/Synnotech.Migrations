@@ -24,14 +24,14 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// </summary>
         /// <param name="session">The RavenDB session used to interact with the database.</param>
         /// <param name="take">
-        /// The amount of migration infos that are retrieved from the database (ordered by AppliedAt). The default value is 50.
+        /// The amount of migration infos that are retrieved from the database (ordered by AppliedAt). The default value is 100.
         /// The actual latest migration info is determined in-memory using the <see cref="Version" /> object.
         /// This is done because string comparison and <see cref="Version" /> comparison leads to different results
         /// when a slot has more than one digit.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="session" /> is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="take" /> is equal or less than 0.</exception>
-        public RavenGetLatestMigrationInfoSession(IAsyncDocumentSession session, int take = 50) : base(session) =>
+        public RavenGetLatestMigrationInfoSession(IAsyncDocumentSession session, int take = 100) : base(session) =>
             Take = take.MustBeGreaterThan(0, nameof(take));
 
         private int Take { get; }
