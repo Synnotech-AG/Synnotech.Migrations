@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
 using Synnotech.Migrations.Core;
@@ -8,7 +9,7 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
 {
     /// <summary>
     /// Represents the default abstraction of a migration applied to RavenDB. This type
-    /// uses <see cref="System.Version" /> to identify and sort migrations. As the context type,
+    /// uses <see cref="Version" /> to identify and sort migrations. As the context type,
     /// <see cref="IAsyncDocumentSession" /> is used.
     /// </summary>
     public abstract class Migration : BaseMigration, IMigration<IAsyncDocumentSession>
@@ -17,8 +18,8 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         /// Initializes a new instance of <see cref="Migration" />.
         /// </summary>
         /// <param name="name">
-        /// The optional name of the migration. If null, <see cref="string.Empty" />, or a string containing only white-space
-        /// is specified, the class name is used as name instead.
+        /// The name of the migration (optional). If the string is null, empty, or contains only white space,
+        /// then the simple type name (not the fully-qualified name) is used.
         /// </param>
         protected Migration(string? name = null) : base(name) { }
 

@@ -13,7 +13,10 @@ namespace Synnotech.Migrations.Core.TextVersions
         /// <summary>
         /// Initializes a new instance of <see cref="BaseMigration" />.
         /// </summary>
-        /// <param name="name">The name of the migration (optional). If null is specified, then the name will be retrieved from <see cref="object.GetType" />.</param>
+        /// <param name="name">
+        /// The name of the migration (optional). If the string is null, empty, or contains only white space,
+        /// then the simple type name (not the fully-qualified name) is used.
+        /// </param>
         /// <param name="fieldCount">The number of components included when the version of this migration is turned into a string. The default is 3 (semantic versions).</param>
         protected BaseMigration(string? name = null, int fieldCount = 3) : base(name) =>
             FieldCount = fieldCount.MustBeIn(Range.FromInclusive(1).ToInclusive(4), nameof(fieldCount));
