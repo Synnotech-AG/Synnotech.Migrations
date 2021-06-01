@@ -81,6 +81,7 @@ namespace Synnotech.Migrations.Core
         /// <param name="migrationBaseType">The base type for all migrations.</param>
         /// <param name="attribute">When every check passed, the attribute that is applied to the migration type.</param>
         /// <returns>True if the specified <paramref name="type" /> is a migration type, else false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="type" /> or <paramref name="migrationBaseType" /> is null.</exception>
         /// <exception cref="MigrationException">Thrown when <paramref name="type" /> has an invalid migration attribute applied to it.</exception>
         public static bool CheckIfTypeIsMigration<TMigrationAttribute>(this Type type,
                                                                        Type migrationBaseType,
