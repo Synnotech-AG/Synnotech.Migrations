@@ -100,13 +100,14 @@ namespace MyRavenDBAccessLayer
     [MigrationVersion("1.0.0")]
     public sealed class InitialMasterData : Migration
     {
-        public override async Task ApplyAsync(IAsyncDocumentSession session)
+        public override async Task ApplyAsync(IAsyncDocumentSession session,
+                                              CancellationToken cancellationToken = default)
         {
             var masterData = MasterData.GetInitialMasterData();
 
             foreach (var item in masterData)
             {
-                await session.StoreAsync(item);
+                await session.StoreAsync(item, cancellationToken);
             }
         }
     }
