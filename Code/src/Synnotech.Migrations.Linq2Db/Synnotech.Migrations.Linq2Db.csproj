@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Linq2Db 0.7.0
---------------------------------
+Synntech.Migrations.Linq2Db 0.8.0
+---------------------------------
 
-- initial release 🥳🎈🎉
+- adapted new implementation of Synnotech.Migrations.Core
+- added support for dependency injection as well as IAsyncDisposable and IDisposable for migrations
+- added support for Synnotech.DatabaseAbstractions 2.x
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
