@@ -5,7 +5,7 @@
 [![Synnotech Logo](synnotech-large-logo.png)](https://www.synnotech.de/)
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/Synnotech-AG/Synnotech.Migrations/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-0.7.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages?q=Synnotech.Migrations)
+[![NuGet](https://img.shields.io/badge/NuGet-0.8.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages?q=Synnotech.Migrations)
 
 When starting a new project, do you always spent too much time on how you can migrate your database? Do you want a migration mechanism that is independent of any persistence technology, like ORMs for relational databases? Worry no more because **Synnotech.Migrations** offers just that! Our generic migration engine is written in such a way so that you can easily adapt it to your own data access layer, no matter the technology: relational databases with and without ORMs, document or graph databases, the file system, or web services - the possibilities are endless.
 
@@ -26,7 +26,7 @@ Please visit the corresponding pages for further documentation.
 
 ## Supported Frameworks
 
-**Synnotech.Migrations** is build for .NET Standard 2.0, so you can use it on [all platforms that support it](https://docs.microsoft.com/en-us/dotnet/standard/net-standard), e.g. like:
+**Synnotech.Migrations** is build for .NET Standard 2.0 and .NET Standard 2.1, so you can use it on [all platforms that support it](https://docs.microsoft.com/en-us/dotnet/standard/net-standard), e.g. like:
 
 - .NET 5 or newer
 - .NET Core 2.0 or newer
