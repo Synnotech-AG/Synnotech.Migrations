@@ -1,4 +1,6 @@
-﻿using Light.GuardClauses;
+﻿using System;
+using Light.GuardClauses;
+using Light.GuardClauses.Exceptions;
 using LinqToDB.Mapping;
 
 namespace Synnotech.Migrations.Linq2Db.TextVersions
@@ -12,8 +14,10 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// Registers the mappings for the <see cref="MigrationInfo" /> instance.
         /// </summary>
         /// <param name="builder">The LinqToDB builder that is used to create mappings from model classes to database tables.</param>
-        /// <param name="tableName">The name of the table that will hold records for migration infos (optional). Defaults</param>
-        /// <returns></returns>
+        /// <param name="tableName">The name of the table that will hold records for migration infos (optional). Defaults to "MigrationInfos".</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="builder" /> or <paramref name="tableName" /> is null.</exception>
+        /// <exception cref="EmptyStringException">Thrown when <paramref name="tableName" /> is an empty string.</exception>
+        /// <exception cref="WhiteSpaceStringException">Thrown when <paramref name="tableName" /> contains only white space.</exception>
         public static FluentMappingBuilder MapMigrationInfo(this FluentMappingBuilder builder, string tableName = "MigrationInfos")
         {
             builder.MustNotBeNull(nameof(builder));
