@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Light.GuardClauses;
 using LinqToDB.Data;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,19 +15,29 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers the default migration engine for Linq2Db with the DI container.
-        /// This method registers <see cref="MigrationEngine" /> and <see cref="SessionFactory" />
-        /// with transient lifetimes.
+        /// <para>
+        /// Registers the default migration engine for LinqToDB with the DI container. This includes the types <see cref="MigrationEngine" />,
+        /// <see cref="SessionFactory" />, the <see cref="MicrosoftDependencyInjectionMigrationFactory{Migration}" /> and <see cref="MigrationInfo.Create" /> as
+        /// a delegate - all of them use transient lifetimes.
+        /// Additionally, all instantiatable types that derive from <see cref="Migration" /> will be registered with the DI container. This way you can
+        /// use dependency injection directly in your migration classes. The migration engine will dispose your migrations when they implement <see cref="IAsyncDisposable" />
+        /// or <see cref="IDisposable" />.
+        /// </para>
+        /// <para>
         /// The session factory requires a Func&lt;DataConnection&gt; to be already registered with the DI container.
         /// This is used to resolve a data connection when constructing session instances.
+        /// </para>
+        /// <para>
         /// IMPORTANT: you should not call this method when you run a custom setup -
         /// please register your own types with the DI container in this case.
+        /// </para>
         /// </summary>
         /// <param name="services">The service collection used to register types with the DI container.</param>
         /// <param name="assembliesContainingMigrations">
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
         /// the calling assembly will be searched.
         /// </param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static IServiceCollection AddSynnotechMigrations(this IServiceCollection services,
                                                                 params Assembly[] assembliesContainingMigrations)
         {
