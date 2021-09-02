@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace Synnotech.Migrations.Core.TextVersions
+namespace Synnotech.Migrations.Core.Int64TimestampVersions
 {
     /// <summary>
     /// <para>
-    /// Represents an asynchronous migration engine that uses <see cref="Version" /> instances
+    /// Represents an asynchronous migration engine that uses <see cref="long" /> timestamp values
     /// to identify and order migrations. The info objects stored in the target system have
-    /// to derive from <see cref="BaseMigrationInfo" /> which serializes the version instances
-    /// as strings.
+    /// to derive from <see cref="BaseMigrationInfo" />.
     /// </para>
     /// <para>
     /// The migration engine searches for migrations in
@@ -17,16 +16,17 @@ namespace Synnotech.Migrations.Core.TextVersions
     /// </summary>
     /// <typeparam name="TMigration">
     /// The base class that identifies all migrations. Must implement <see cref="IMigration{TContext}" /> and
-    /// <see cref="IHasMigrationVersion{Version}" />.
+    /// <see cref="IHasMigrationVersion{TMigrationVersion}" />
     /// </typeparam>
     /// <typeparam name="TMigrationInfo">
-    /// That type whose instances are stored in the target system to indicate which
-    /// migrations already have been applied.
+    /// The type whose instances are stored in the target system to indicate which migrations have been applied.
     /// </typeparam>
-    /// <typeparam name="TMigrationContext">The type whose instances are passed to each migration when they are applied.</typeparam>
+    /// <typeparam name="TMigrationContext">
+    /// The type whose instances are passed to each migration when they are applied.
+    /// </typeparam>
     public class MigrationEngine<TMigration, TMigrationInfo, TMigrationContext>
-        : MigrationEngine<Version, TMigration, MigrationVersionAttribute, TMigrationInfo, TMigrationContext>
-        where TMigration : IMigration<TMigrationContext>, IHasMigrationVersion<Version>
+        : MigrationEngine<long, TMigration, MigrationVersionAttribute, TMigrationInfo, TMigrationContext>
+        where TMigration : IMigration<TMigrationContext>, IHasMigrationVersion<long>
         where TMigrationInfo : BaseMigrationInfo
     {
         /// <summary>

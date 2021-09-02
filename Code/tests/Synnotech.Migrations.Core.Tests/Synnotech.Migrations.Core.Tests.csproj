@@ -6,4 +6,8 @@
 		<ProjectReference Include="..\..\src\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Int64TimestampVersions\" />
+	</ItemGroup>
+
 </Project>
