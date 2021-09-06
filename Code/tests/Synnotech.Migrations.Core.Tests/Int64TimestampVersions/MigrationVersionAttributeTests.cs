@@ -18,7 +18,7 @@ namespace Synnotech.Migrations.Core.Tests.Int64TimestampVersions
         [Theory]
         [InlineData(20210902082700)]
         [InlineData(20180531163135)]
-        public static void InstantiateAttribute(long version)
+        public static void ValidInt64ValueShouldNotThrowOnValidate(long version)
         {
             var attribute = new MigrationVersionAttribute(version);
 
