@@ -122,6 +122,12 @@ namespace Synnotech.Migrations.Core.Int64TimestampVersions
 
         private static bool TryParseSecond(string timestamp, out int second)
         {
+            if (timestamp.Length == 17)
+            {
+                second = 0;
+                return true;
+            }
+
             if (timestamp.Length == 20)
                 return timestamp.TryParseTwoDigits(17, out second);
 
