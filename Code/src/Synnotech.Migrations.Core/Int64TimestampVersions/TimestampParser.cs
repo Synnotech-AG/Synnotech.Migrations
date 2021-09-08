@@ -3,8 +3,22 @@ using Light.GuardClauses;
 
 namespace Synnotech.Migrations.Core.Int64TimestampVersions
 {
+    /// <summary>
+    /// Provides a member to parse ISO 8601 UTC timestamps.
+    /// </summary>
     public static class TimestampParser
     {
+        /// <summary>
+        /// Tries to parse the specified string as an ISO 8601 UTC timestamp. The string
+        /// must have one of the following formats:
+        /// <list type="bullet">
+        /// <item>yyyy-MM-ddThh:mmZ</item>
+        /// <item>yyyy-MM-ddThh:mm:ssZ</item>
+        /// </list>
+        /// </summary>
+        /// <param name="timestamp">The string that should be parsed</param>
+        /// <param name="int64Timestamp">The parsed value.</param>
+        /// <returns>True if parsing was successful, else false.</returns>
         public static bool TryParseTimestamp(string timestamp, out long int64Timestamp)
         {
             // The formats that we accept are:
