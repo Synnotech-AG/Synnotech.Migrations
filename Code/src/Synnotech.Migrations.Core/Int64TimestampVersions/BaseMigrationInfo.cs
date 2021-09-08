@@ -1,4 +1,5 @@
 ﻿using System;
+using Light.GuardClauses;
 
 namespace Synnotech.Migrations.Core.Int64TimestampVersions
 {
@@ -9,6 +10,8 @@ namespace Synnotech.Migrations.Core.Int64TimestampVersions
     /// </summary>
     public abstract class BaseMigrationInfo : IHasMigrationVersion<long>
     {
+        private string? _name;
+
         /// <summary>
         /// Gets or sets the version (as an Int64 timestamp).
         /// </summary>
@@ -17,7 +20,11 @@ namespace Synnotech.Migrations.Core.Int64TimestampVersions
         /// <summary>
         /// Gets or sets the name of the migration.
         /// </summary>
-        public string? Name { get; set; }
+        public string? Name
+        {
+            get => _name;
+            set => _name = value.MustNotBeNullOrWhiteSpace();
+        }
 
         /// <summary>
         /// Gets or sets the date when the migration was applied. We recommend that you
