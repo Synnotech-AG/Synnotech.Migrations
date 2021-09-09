@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Core", "src\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj", "{C650B65A-B6E8-496E-A7AA-51EF08A872DC}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Linq2Db", "src\Synnotech.Migrations.Linq2Db\Synnotech.Migrations.Linq2Db.csproj", "{3C20ABB3-4DA5-4CE4-B7BA-91F9D62DB061}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Linq2Db.Tests", "tests\Synnotech.Migrations.Linq2Db.Tests\Synnotech.Migrations.Linq2Db.Tests.csproj", "{EA888059-217E-485F-9A0B-D29953AADF4C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{4B9690D6-023F-4BD8-97DB-3C454604CD47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synnotech.Migrations.Core.Analyzers", "Synnotech.Migrations.Core.Analyzers\Synnotech.Migrations.Core.Analyzers.csproj", "{58266832-E6F3-44D7-B302-3BFA15A1DF1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +53,10 @@ Global
 		{EA888059-217E-485F-9A0B-D29953AADF4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA888059-217E-485F-9A0B-D29953AADF4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA888059-217E-485F-9A0B-D29953AADF4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58266832-E6F3-44D7-B302-3BFA15A1DF1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58266832-E6F3-44D7-B302-3BFA15A1DF1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58266832-E6F3-44D7-B302-3BFA15A1DF1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58266832-E6F3-44D7-B302-3BFA15A1DF1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +66,7 @@ Global
 		{1EE5A3C1-2823-49BF-B7FC-0B90547037AE} = {B67779F2-A667-43FB-8B28-964958C048C0}
 		{3C20ABB3-4DA5-4CE4-B7BA-91F9D62DB061} = {F0AF798C-B1ED-4F70-B57A-2A33BF30CE8D}
 		{EA888059-217E-485F-9A0B-D29953AADF4C} = {F0AF798C-B1ED-4F70-B57A-2A33BF30CE8D}
+		{58266832-E6F3-44D7-B302-3BFA15A1DF1F} = {4B9690D6-023F-4BD8-97DB-3C454604CD47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {87DD232F-65EB-409A-AD28-607B3418E8D9}
