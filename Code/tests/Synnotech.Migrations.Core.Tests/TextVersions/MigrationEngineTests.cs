@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Synnotech.DatabaseAbstractions.Mocks;
 using Synnotech.Migrations.Core.TextVersions;
 using Xunit;
 
@@ -27,7 +28,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 new () { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos, config => config.WithStrictOrdering());
-            Context.MustBeCommittedAndDisposed();
+            Context.SaveChangesMustHaveBeenCalled(3)
+                   .MustBeDisposed();
         }
 
         [Fact]
@@ -44,7 +46,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 new () { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos);
-            Context.MustBeCommittedAndDisposed();
+            Context.SaveChangesMustHaveBeenCalled()
+                   .MustBeDisposed();
         }
 
         [Fact]
@@ -55,7 +58,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             var summary = await RunMigrationAsync();
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
             appliedMigrations.Should().BeNullOrEmpty();
-            Context.MustBeRolledBackAndDisposed();
+            Context.SaveChangesMustNotHaveBeenCalled()
+                   .MustBeDisposed();
         }
 
         private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync()
@@ -88,24 +92,13 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         public int Id { get; set; }
     }
 
-
-    public sealed class TestContext : IGetLatestMigrationInfoSession<TestMigrationInfo>, IMigrationSession<TestContext, TestMigrationInfo>
+    public sealed class TestContext : AsyncSessionMock, IGetLatestMigrationInfoSession<TestMigrationInfo>, IMigrationSession<TestContext, TestMigrationInfo>
     {
-        public int DisposeCallCount;
         public TestMigrationInfo? LatestMigrationInfo;
-        public int SaveChangesCallCount;
         public List<TestMigrationInfo> StoredMigrationInfos = new ();
-
-        public void Dispose() => DisposeCallCount++;
 
         public Task<TestMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken) =>
             Task.FromResult(LatestMigrationInfo);
-
-        public ValueTask DisposeAsync()
-        {
-            Dispose();
-            return default;
-        }
 
         public TestContext Context => this;
 
@@ -115,28 +108,10 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             return default;
         }
 
-        public Task SaveChangesAsync(CancellationToken cancellationToken)
+        public TestContext SaveChangesMustHaveBeenCalled(int times)
         {
-            SaveChangesCallCount++;
-            return Task.CompletedTask;
-        }
-
-        public void MustBeDisposed() => DisposeCallCount.Should().BeGreaterOrEqualTo(1, "Dispose must be called at least once");
-
-        public void MustBeCommitted() => SaveChangesCallCount.Should().BeGreaterOrEqualTo(1, "SaveChanges must have been called.");
-
-        public void MustBeRolledBack() => SaveChangesCallCount.Should().Be(0, "SaveChanges must not have been called.");
-
-        public void MustBeCommittedAndDisposed()
-        {
-            MustBeCommitted();
-            MustBeDisposed();
-        }
-
-        public void MustBeRolledBackAndDisposed()
-        {
-            MustBeRolledBack();
-            MustBeDisposed();
+            SaveChangesCallCount.Should().Be(times);
+            return this;
         }
     }
 
