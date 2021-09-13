@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 
 namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
 {
@@ -9,7 +10,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
             if (typeSymbol.TypeKind != TypeKind.Class)
                 return false;
 
-
+            throw new NotImplementedException();
         }
     }
 }
