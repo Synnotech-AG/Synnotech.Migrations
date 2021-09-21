@@ -26,6 +26,9 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
             if (typeSymbol.TypeKind != TypeKind.Class)
                 return false;
 
+            if (typeSymbol.IsAbstract)
+                return false;
+
             var currentBaseType = typeSymbol.BaseType;
             while (currentBaseType != null)
             {
