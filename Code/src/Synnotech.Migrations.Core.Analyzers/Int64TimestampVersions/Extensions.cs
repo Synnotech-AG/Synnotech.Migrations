@@ -36,7 +36,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                     goto Continue;
 
                 var @namespace = currentBaseType.ContainingNamespace;
-                if (@namespace.Name == Constants.Int64TimestampVersionsNamespace)
+                if (@namespace.IsInt64TimestampVersionsNamespace())
                     return true;
                 
                 Continue:
@@ -55,6 +55,27 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
 
             var attributeData = typeSymbol.GetAttributes();
             return attributeData.Length == 0;
+        }
+
+        private static bool IsInt64TimestampVersionsNamespace(this INamespaceSymbol namespaceSymbol)
+        {
+            if (namespaceSymbol.Name != "Int64TimestampVersions")
+                return false;
+
+            namespaceSymbol = namespaceSymbol.ContainingNamespace;
+            if (namespaceSymbol.Name != "Core")
+                return false;
+
+            namespaceSymbol = namespaceSymbol.ContainingNamespace;
+            if (namespaceSymbol.Name != "Migrations")
+                return false;
+
+            namespaceSymbol = namespaceSymbol.ContainingNamespace;
+            if (namespaceSymbol.Name != "Synnotech")
+                return false;
+
+            namespaceSymbol = namespaceSymbol.ContainingNamespace;
+            return namespaceSymbol.Name == "";
         }
     }
 }

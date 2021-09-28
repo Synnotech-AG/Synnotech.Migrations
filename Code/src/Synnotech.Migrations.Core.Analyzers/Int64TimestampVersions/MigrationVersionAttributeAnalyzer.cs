@@ -20,7 +20,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-            context.EnableConcurrentExecution();
+            //context.EnableConcurrentExecution();
             context.RegisterSymbolAction(AnalyzeMigrationClassForVersionAttribute, SymbolKind.NamedType);
         }
 
@@ -28,7 +28,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         {
             var typeSymbol = (INamedTypeSymbol) context.Symbol;
 
-            if (!typeSymbol.IsInt64TimestampMigrationWithoutVersionAttribute())
+            if (typeSymbol.IsInt64TimestampMigrationWithoutVersionAttribute())
                 return;
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.MissingMigrationVersionAttribute, typeSymbol.Locations[0]));

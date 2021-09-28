@@ -2,6 +2,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Synnotech.Migrations.Core.Analyzers\Synnotech.Migrations.Core.Analyzers.csproj" />
 		<ProjectReference Include="..\..\src\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
+        <PackageReference Include="Basic.Reference.Assemblies" Version="1.2.4" />
 	</ItemGroup>
 
 	<ItemGroup>
