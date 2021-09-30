@@ -34,5 +34,17 @@ namespace MyProject.DataAccess.Migrations
             diagnostics.Should().HaveCount(1);
             diagnostics[0].Descriptor.Should().BeSameAs(Descriptors.MissingMigrationVersionAttribute);
         }
+
+        [Fact]
+        public async Task FixMissingAttribute()
+        {
+            var codeFix = new VersionAttributeFix();
+            var resultingCode = await codeFix.ApplyFixAsync(MissingMigrationAttributeCode, Analyzer);
+
+            Output.WriteLine(resultingCode);
+
+            resultingCode.Should().Contain("using Synnotech.Migrations.Core.Int64TimestampVersions;");
+            resultingCode.Should().Contain("[MigrationVersion(\"");
+        }
     }
 }

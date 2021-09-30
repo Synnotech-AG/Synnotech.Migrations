@@ -1,4 +1,4 @@
-﻿using Light.GuardClauses;
+﻿using System;
 using Microsoft.CodeAnalysis;
 
 namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
@@ -21,7 +21,8 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         /// </summary>
         public static bool IsDerivingFromBaseMigration(this INamedTypeSymbol typeSymbol)
         {
-            typeSymbol.MustNotBeNull(nameof(typeSymbol));
+            if (typeSymbol == null)
+                throw new ArgumentNullException(nameof(typeSymbol));
 
             if (typeSymbol.TypeKind != TypeKind.Class)
                 return false;
@@ -51,7 +52,8 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         /// </summary>
         public static bool IsWithoutMigrationVersionAttribute(this INamedTypeSymbol typeSymbol)
         {
-            typeSymbol.MustNotBeNull(nameof(typeSymbol));
+            if (typeSymbol == null)
+                throw new ArgumentNullException(nameof(typeSymbol));
 
             var attributeData = typeSymbol.GetAttributes();
             return attributeData.Length == 0;

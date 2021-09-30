@@ -32,7 +32,8 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                 return;
 
             var diagnostic = context.Diagnostics[0];
-            var classSyntax = (ClassDeclarationSyntax) compilationUnit.FindNode(diagnostic.Location.SourceSpan);
+            var targetNode = compilationUnit.FindNode(diagnostic.Location.SourceSpan);
+            var classSyntax = (ClassDeclarationSyntax) targetNode;
 
             var title = diagnostic.Descriptor.Title.ToString();
             context.RegisterCodeFix(CodeAction.Create(title,
@@ -62,6 +63,9 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                                                         Literal(timestamp)))))))))
                    .NormalizeWhitespace();
 
+            syntaxRoot = syntaxRoot.ReplaceNode(classDeclarationSyntax, newClassDeclarationSyntax)
+                                   .NormalizeWhitespace();
+
             // Check if the using directive must be inserted
             if (syntaxRoot.DescendantNodes()
                           .OfType<UsingDirectiveSyntax>()
@@ -81,10 +85,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                        .NormalizeWhitespace();
             }
 
-            // Insert the new class declaration into the syntax root
-            return Task.FromResult(
-                document.WithSyntaxRoot(
-                    syntaxRoot.ReplaceNode(classDeclarationSyntax, newClassDeclarationSyntax)));
+            return Task.FromResult(document.WithSyntaxRoot(syntaxRoot));
         }
     }
 }

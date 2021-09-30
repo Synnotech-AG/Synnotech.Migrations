@@ -1,5 +1,4 @@
 ﻿using System;
-using Light.GuardClauses;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
@@ -25,8 +24,12 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         /// <param name="identifiers">The strings that make up the full name.</param>
         public static bool EqualsQualifiedName(this NameSyntax nameSyntax, string[] identifiers)
         {
-            nameSyntax.MustNotBeNull(nameof(nameSyntax));
-            identifiers.MustNotBeNullOrEmpty(nameof(identifiers));
+            if (nameSyntax == null)
+                throw new ArgumentNullException(nameof(nameSyntax));
+            if (identifiers == null)
+                throw new ArgumentNullException(nameof(identifiers));
+            if (identifiers.Length == 0)
+                return false;
 
             var remainingIdentifiers = new ReadOnlySpan<string>(identifiers);
             return CheckIdentifierNamesRecursively(nameSyntax, ref remainingIdentifiers, 0);
