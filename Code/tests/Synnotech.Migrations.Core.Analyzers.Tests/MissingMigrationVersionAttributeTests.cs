@@ -21,6 +21,15 @@ namespace MyProject.DataAccess.Migrations
     public sealed class MyMigration : Migration { }
 }";
 
+        private const string FixedMigrationAttributeCode = @"
+using Synnotech.Migrations.Core.Int64TimestampVersions;
+
+namespace MyProject.DataAccess.Migrations
+{
+    [MigrationVersion(""2021-10-01T00:25:30"")]
+    public sealed class MyMigration : Migration { }
+}";
+
         [Fact]
         public async Task AnalyzeMissingAttribute()
         {
@@ -45,6 +54,14 @@ namespace MyProject.DataAccess.Migrations
 
             resultingCode.Should().Contain("using Synnotech.Migrations.Core.Int64TimestampVersions;");
             resultingCode.Should().Contain("[MigrationVersion(\"");
+        }
+
+        [Fact]
+        public async Task AnalyzerShouldNotTriggerWhenAttributeIsPresent()
+        {
+            var diagnostics = await Analyzer.AnalyzeAsync(FixedMigrationAttributeCode);
+
+            diagnostics.Should().BeEmpty();
         }
     }
 }
