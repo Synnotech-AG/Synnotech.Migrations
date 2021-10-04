@@ -90,6 +90,29 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
             summary.EnsureSuccess();
         }
 
+        [SkippableFact]
+        public async Task RunPreviousMigrations()
+        {
+            await using var container = await InitializeOrSkipTestAsync();
+            var now = DateTime.UtcNow;
+            await using (var dataConnection = container.GetRequiredService<DataConnection>())
+            {
+                await dataConnection.CreateTableAsync<MigrationInfo>();
+                await dataConnection.InsertAsync(new MigrationInfo { Name = nameof(AddFirstMasterDataEntry), Version = "0.2.0", AppliedAt = now.AddDays(-2) });
+            }
+
+            var migrationEngine = container.GetRequiredService<MigrationEngine>();
+            var summary = await migrationEngine.MigrateAsync(now, approach: MigrationApproach.AllNonAppliedMigrations);
+            LogSummary(summary);
+
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            var expectedMigrationInfos = new List<MigrationInfo>
+            {
+                new () { Id = 2, Name = nameof(InitialTableStructure), Version = "0.1.0", AppliedAt = now }
+            };
+            appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos);
+        }
+
         private static async Task<ServiceProvider> InitializeOrSkipTestAsync()
         {
             var (connectionString, sqlServerVersion) = TestSettings.GetConnectionSettingsOrSkip();

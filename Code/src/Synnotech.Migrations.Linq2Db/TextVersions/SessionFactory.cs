@@ -57,5 +57,12 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
                 await dataConnection.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             return new LinqToDbMigrationSession(dataConnection);
         }
+
+        /// <summary>
+        /// Creates the session that is used to retrieve all migration infos from the target database.
+        /// </summary>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask<IGetAllMigrationInfosSession<MigrationInfo>> CreateSessionForRetrievingAllMigrationInfosAsync(CancellationToken cancellationToken = default) =>
+            new (new LinqToDbGetAllMigrationInfosSession(CreateDataConnection()));
     }
 }
