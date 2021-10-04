@@ -1,5 +1,6 @@
 ﻿using System;
 using Light.GuardClauses;
+using Light.GuardClauses.FrameworkExtensions;
 
 namespace Synnotech.Migrations.Core.Int64TimestampVersions
 {
@@ -16,7 +17,7 @@ namespace Synnotech.Migrations.Core.Int64TimestampVersions
         /// <item>yyyy-MM-ddThh:mm:ssZ</item>
         /// </list>
         /// </summary>
-        /// <param name="timestamp">The string that should be parsed</param>
+        /// <param name="timestamp">The string that should be parsed.</param>
         /// <param name="int64Timestamp">The parsed value.</param>
         /// <returns>True if parsing was successful, else false.</returns>
         public static bool TryParseTimestamp(string timestamp, out long int64Timestamp)
@@ -47,6 +48,24 @@ namespace Synnotech.Migrations.Core.Int64TimestampVersions
             ParsingFailed:
             int64Timestamp = default;
             return false;
+        }
+
+        /// <summary>
+        /// Parses the specified string as an ISO 8601 UTC timestamp. If parsing fails, an
+        /// <see cref="ArgumentException"/> will be thrown.
+        /// The string must have one of the following formats:
+        /// <list type="bullet">
+        /// <item>yyyy-MM-ddThh:mmZ</item>
+        /// <item>yyyy-MM-ddThh:mm:ssZ</item>
+        /// </list>
+        /// </summary>
+        /// <param name="timestamp">The string that should be parsed.</param>
+        /// <exception cref="ArgumentException">Thrown when parsing was unsuccessful.</exception>
+        public static long ParseTimestamp(string timestamp)
+        {
+            if (!TryParseTimestamp(timestamp, out var int64Timestamp))
+                throw new ArgumentException($"The timestamp {int64Timestamp.ToStringOrNull()} cannot be parsed to a long value for a migration version.", nameof(timestamp));
+            return int64Timestamp;
         }
 
         private static long ConvertToInt64(int year, int month, int day, int hour, int minute, int second)

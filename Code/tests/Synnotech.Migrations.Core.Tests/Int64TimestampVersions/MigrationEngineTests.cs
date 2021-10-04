@@ -62,10 +62,28 @@ namespace Synnotech.Migrations.Core.Tests.Int64TimestampVersions
                    .MustBeDisposed();
         }
 
-        private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync()
+        [Fact]
+        public async Task RunPreviousMigrations()
+        {
+            Context.ExistingMigrationInfos.Add(new () {Id = 1, Version = TimestampParser.ParseTimestamp("2021-01-09T08:15Z"), Name = nameof(Migration2), AppliedAt = UtcNow.AddDays(3)});
+
+            var summary = await RunMigrationAsync(MigrationApproach.AllNonAppliedMigrations);
+
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            var expectedMigrations = new List<TestMigrationInfo>
+            {
+                new () { Id = 2, Version = TimestampParser.ParseTimestamp("2020-12-15T08:30Z"), Name = nameof(Migration1), AppliedAt = UtcNow },
+                new () { Id = 3, Version = TimestampParser.ParseTimestamp("2021-02-17T16:37Z"), Name = nameof(Migration3), AppliedAt = UtcNow }
+            };
+            appliedMigrations.Should().BeEquivalentTo(expectedMigrations);
+            Context.SaveChangesMustHaveBeenCalled(2)
+                   .MustBeDisposed();
+        }
+
+        private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync(MigrationApproach approach = MigrationApproach.MigrationsWithNewerVersions)
         {
             var engine = new MigrationEngine<TestMigration, TestMigrationInfo, TestContext>(new TestSessionFactory(Context), new ActivatorMigrationFactory<TestMigration>(), MigrationInfoFactory.Create);
-            return engine.MigrateAsync(UtcNow, new[] { typeof(MigrationEngineTests).Assembly });
+            return engine.MigrateAsync(UtcNow, new[] { typeof(MigrationEngineTests).Assembly }, approach);
         }
 
         public abstract class TestMigration : BaseMigration, IMigration<TestContext>
@@ -88,10 +106,12 @@ namespace Synnotech.Migrations.Core.Tests.Int64TimestampVersions
 
         public sealed class TestContext : AsyncSessionMock,
                                           IGetLatestMigrationInfoSession<TestMigrationInfo>,
-                                          IMigrationSession<TestContext, TestMigrationInfo>
+                                          IMigrationSession<TestContext, TestMigrationInfo>,
+                                          IGetAllMigrationInfosSession<TestMigrationInfo>
         {
-            public TestMigrationInfo? LatestMigrationInfo;
-            public List<TestMigrationInfo> StoredMigrationInfos = new ();
+            public TestMigrationInfo? LatestMigrationInfo { get; set; }
+            public List<TestMigrationInfo> ExistingMigrationInfos { get; set; } = new ();
+            public List<TestMigrationInfo> StoredMigrationInfos { get; set; } = new ();
 
             public Task<TestMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken = default) =>
                 Task.FromResult(LatestMigrationInfo);
@@ -103,6 +123,9 @@ namespace Synnotech.Migrations.Core.Tests.Int64TimestampVersions
                 StoredMigrationInfos.Add(migrationInfo);
                 return default;
             }
+
+            public Task<List<TestMigrationInfo>> GetAllMigrationInfosAsync(CancellationToken cancellationToken = default) =>
+                Task.FromResult(ExistingMigrationInfos);
 
             public TestContext SaveChangesMustHaveBeenCalled(int times)
             {
@@ -141,6 +164,11 @@ namespace Synnotech.Migrations.Core.Tests.Int64TimestampVersions
             public ValueTask<IGetLatestMigrationInfoSession<TestMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken) => new (_testContext);
 
             public ValueTask<IMigrationSession<TestContext, TestMigrationInfo>> CreateSessionForMigrationAsync(TestMigration migration, CancellationToken cancellationToken) => new (_testContext);
+
+            public ValueTask<IGetAllMigrationInfosSession<TestMigrationInfo>> CreateSessionForRetrievingAllMigrationInfosAsync(CancellationToken cancellationToken = default)
+            {
+                return new (_testContext);
+            }
         }
     }
 }
