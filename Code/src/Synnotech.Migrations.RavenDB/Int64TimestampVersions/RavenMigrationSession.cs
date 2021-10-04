@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
 using Raven.Client.Exceptions;
 using Synnotech.Migrations.Core;
-using Synnotech.Migrations.Core.TextVersions;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
 using Synnotech.RavenDB;
 
-namespace Synnotech.Migrations.RavenDB.TextVersions
+namespace Synnotech.Migrations.RavenDB.Int64TimestampVersions
 {
     /// <summary>
     /// Represents the session that is used to apply a migration and store the corresponding migration info.
