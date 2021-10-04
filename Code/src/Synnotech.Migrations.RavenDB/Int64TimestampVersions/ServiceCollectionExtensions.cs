@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Synnotech.Migrations.Core;
-using Synnotech.Migrations.Core.TextVersions;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
 
-namespace Synnotech.Migrations.RavenDB.TextVersions
+namespace Synnotech.Migrations.RavenDB.Int64TimestampVersions
 {
     /// <summary>
     /// Provides methods to register the migration engine with the DI container.
@@ -16,8 +16,8 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
     {
         /// <summary>
         /// <para>
-        /// Registers the default migration engine for Raven DB with the DI Container. The migration engine uses text versions.
-        /// All instances (<see cref="MigrationEngine" />, <see cref="SessionFactory" />, and <see cref="MicrosoftDependencyInjectionMigrationFactory{TMigration}" />)
+        /// Registers the default migration engine for Raven DB with the DI container. The migration uses Int64 timestamps.
+        /// All instances <see cref="MigrationEngine" />, <see cref="SessionFactory" />, and <see cref="MicrosoftDependencyInjectionMigrationFactory{TMigration}" />)
         /// will be added with a transient lifetime. A registration for <see cref="IDocumentStore" /> must already be present
         /// (usually with a singleton lifetime).
         /// </para>
