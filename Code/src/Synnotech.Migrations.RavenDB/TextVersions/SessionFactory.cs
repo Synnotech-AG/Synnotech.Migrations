@@ -45,5 +45,12 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
         public ValueTask<IMigrationSession<IAsyncDocumentSession, MigrationInfo>> CreateSessionForMigrationAsync(Migration migration,
                                                                                                                  CancellationToken cancellationToken = default) =>
             new (new RavenMigrationSession(Store.OpenAsyncSession()));
+
+        /// <summary>
+        /// Creates the session that is used to retrieve all migration infos from the target RavenDB database.
+        /// </summary>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        public ValueTask<IGetAllMigrationInfosSession<MigrationInfo>> CreateSessionForRetrievingAllMigrationInfosAsync(CancellationToken cancellationToken = default) =>
+            new (new RavenGetAllMigrationInfosSession(Store.OpenAsyncSession()));
     }
 }

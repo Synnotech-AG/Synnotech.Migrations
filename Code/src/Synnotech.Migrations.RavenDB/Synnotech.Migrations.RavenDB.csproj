@@ -13,6 +13,6 @@ Synntech.Migrations.RavenDB 0.8.0
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="Synnotech.RavenDB" Version="2.0.0" />
+		<PackageReference Include="Synnotech.RavenDB" Version="3.0.0" />
 	</ItemGroup>
 </Project>

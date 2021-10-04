@@ -106,6 +106,29 @@ namespace Synnotech.Migrations.RavenDB.Tests.TextVersions
             migrationPlan.Should().Be(expectedPlan);
         }
 
+        [SkippableFact]
+        public async Task RunPreviousMigrations()
+        {
+            TestSettings.SkipTestIfNecessary();
+
+            var now = DateTime.UtcNow;
+            await using var container = CreateContainer();
+            var migrationEngine = container.GetRequiredService<MigrationEngine>();
+            using var session = container.GetRequiredService<IDocumentStore>().OpenAsyncSession();
+            session.Advanced.WaitForIndexesAfterSaveChanges();
+            await session.StoreAsync(new MigrationInfo { Id = "migrationInfos/2.0.0", Name = nameof(FirstMigration), Version = "2.0.0", AppliedAt = DateTime.UtcNow.AddDays(-1) });
+            await session.SaveChangesAsync();
+
+            var summary = await migrationEngine.MigrateAsync(now, approach: MigrationApproach.AllNonAppliedMigrations);
+
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            var expectedMigrations = new List<MigrationInfo>
+            {
+                new () { Id = "migrationInfos/1.0.0", Name = nameof(FirstMigration), Version = "1.0.0", AppliedAt = now }
+            };
+            appliedMigrations.Should().BeEquivalentTo(expectedMigrations);
+        }
+
         private ServiceProvider CreateContainer([CallerMemberName] string? databaseName = null) =>
             PrepareContainer(databaseName).AddSynnotechMigrations()
                                           .BuildServiceProvider();
