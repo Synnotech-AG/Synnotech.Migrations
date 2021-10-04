@@ -9,6 +9,13 @@
         <developmentDependency>true</developmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <PackageReleaseNotes>
+Synntech.Migrations.Core.Analyzers 0.9.0
+--------------------------------------------
+
+- this pacakge can be used to create a Int64 timestamp for migrations via a Roslyn analyzer and code fix
+- you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
+        </PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
