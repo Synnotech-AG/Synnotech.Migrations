@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <Description>Provides Roslyn analyzers and code fixes for Synnotech.Migrations.</Description>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <GeneratePacakgeOnBuild>true</GeneratePacakgeOnBuild>
         <PackageTags>Roslyn, Synnotech Migrations, Migration Version Attribute, Analyzer, Code Fix</PackageTags>
@@ -10,10 +11,10 @@
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <PackageReleaseNotes>
-Synntech.Migrations.Core.Analyzers 0.9.0
+Synntech.Migrations.Core.Analyzers 0.10.0
 --------------------------------------------
 
-- this pacakge can be used to create a Int64 timestamp for migrations via a Roslyn analyzer and code fix
+- added an additional code fix action that creates the timestamp as an Int64 value
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
         </PackageReleaseNotes>
     </PropertyGroup>
