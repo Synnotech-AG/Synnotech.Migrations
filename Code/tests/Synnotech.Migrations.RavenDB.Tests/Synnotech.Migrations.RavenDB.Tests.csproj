@@ -11,6 +11,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <Compile Include="..\AssemblyInfos.cs" Link="AssemblyInfos.cs" />
-        <Analyzer Include="..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll" Condition="Exists('..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll')" />
+        <Analyzer Include="..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll"
+                  Condition="Exists('..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll')" />
     </ItemGroup>
 </Project>
