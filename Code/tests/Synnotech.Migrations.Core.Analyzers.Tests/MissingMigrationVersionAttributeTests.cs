@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions;
@@ -26,7 +27,7 @@ using Synnotech.Migrations.Core.Int64TimestampVersions;
 
 namespace MyProject.DataAccess.Migrations
 {
-    [MigrationVersion(""2021-10-01T00:25:30"")]
+    [MigrationVersion(""2021-10-01T00:25:30Z"")]
     public sealed class MyMigration : Migration { }
 }";
 
@@ -45,15 +46,49 @@ namespace MyProject.DataAccess.Migrations
         }
 
         [Fact]
-        public async Task FixMissingAttribute()
+        public async Task FixMissingAttributeWithIso8601String()
         {
-            var codeFix = new VersionAttributeFix();
+            var now = DateTime.UtcNow;
+            var codeFix = new VersionAttributeFix { PredefinedDateTime = now };
             var resultingCode = await codeFix.ApplyFixAsync(MissingMigrationAttributeCode, Analyzer);
 
             Output.WriteLine(resultingCode);
 
-            resultingCode.Should().Contain("using Synnotech.Migrations.Core.Int64TimestampVersions;");
-            resultingCode.Should().Contain("[MigrationVersion(\"");
+            var iso8601Timestamp = now.ToIso8601UtcString();
+            var expectedCode =
+$@"using Synnotech.Migrations.Core.Int64TimestampVersions;
+
+namespace MyProject.DataAccess.Migrations
+{{
+    [MigrationVersion(""{iso8601Timestamp}"")]
+    public sealed class MyMigration : Migration
+    {{
+    }}
+}}";
+            resultingCode.Should().Be(expectedCode);
+        }
+
+        [Fact]
+        public async Task FixMissingAttributeWithInt64Timestamp()
+        {
+            var now = DateTime.UtcNow;
+            var codeFix = new VersionAttributeFix { PredefinedDateTime = now };
+            var resultingCode = await codeFix.ApplyFixAsync(MissingMigrationAttributeCode, Analyzer, 1);
+
+            Output.WriteLine(resultingCode);
+
+            var int64Timestamp = now.ToInt64Timestamp();
+            var expectedCode =
+$@"using Synnotech.Migrations.Core.Int64TimestampVersions;
+
+namespace MyProject.DataAccess.Migrations
+{{
+    [MigrationVersion({int64Timestamp}L)]
+    public sealed class MyMigration : Migration
+    {{
+    }}
+}}";
+            resultingCode.Should().Be(expectedCode);
         }
 
         [Fact]
