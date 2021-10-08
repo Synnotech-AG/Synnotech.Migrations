@@ -5,9 +5,9 @@ using LinqToDB;
 using LinqToDB.Data;
 using Synnotech.Linq2Db;
 using Synnotech.Migrations.Core;
-using Synnotech.Migrations.Core.TextVersions;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
 
-namespace Synnotech.Migrations.Linq2Db.TextVersions
+namespace Synnotech.Migrations.Linq2Db.Int64TimestampVersions
 {
     /// <summary>
     /// Represents the session that is used to apply a single migration and store a corresponding migration info via LinqToDB.
@@ -19,7 +19,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         where TDataConnection : DataConnection
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="LinqToDbMigrationSession{TDataConnection, TMigrationInfo}" />.
+        /// Initializes a new instance of <see cref="LinqToDbMigrationSession{TDataConnection,TMigrationInfo}" />.
         /// </summary>
         /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
@@ -40,7 +40,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     }
 
     /// <summary>
-    /// Represents the session that is used to apply a single migration and store a corresponding migration info via LinqToDB.
+    /// Represents the session that is used to apply migrations and store corresponding migration info via LinqToDB.
     /// <see cref="MigrationInfo" /> is used as the type that represents a migration info.
     /// </summary>
     /// <typeparam name="TDataConnection">Your custom subtype that derives from <see cref="DataConnection" />.</typeparam>
@@ -50,7 +50,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <summary>
         /// Initializes a new instance of <see cref="LinqToDbMigrationSession{TDataConnection}" />.
         /// </summary>
-        /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
+        /// <param name="dataConnection">>The LinqToDB data connection used to interact with the database.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public LinqToDbMigrationSession(TDataConnection dataConnection) : base(dataConnection) { }
 

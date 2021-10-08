@@ -15,6 +15,6 @@ Synntech.Migrations.Linq2Db 0.8.0
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
 		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
-		<PackageReference Include="Synnotech.Linq2Db" Version="5.0.0" />
+		<PackageReference Include="Synnotech.Linq2Db" Version="6.0.0" />
 	</ItemGroup>
 </Project>

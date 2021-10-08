@@ -8,9 +8,9 @@ using LinqToDB;
 using LinqToDB.Data;
 using Synnotech.Linq2Db;
 using Synnotech.Migrations.Core;
-using Synnotech.Migrations.Core.TextVersions;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
 
-namespace Synnotech.Migrations.Linq2Db.TextVersions
+namespace Synnotech.Migrations.Linq2Db.Int64TimestampVersions
 {
     /// <summary>
     /// Represents the session that retrieves all migration infos for LinqToDB.
@@ -34,10 +34,9 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         {
             try
             {
-                var migrationInfos = await DataConnection.GetTable<TMigrationInfo>()
-                                                         .OrderBy(migrationInfo => migrationInfo.AppliedAt)
-                                                         .ToListAsync(cancellationToken);
-                return migrationInfos;
+                return await DataConnection.GetTable<TMigrationInfo>()
+                                           .OrderBy(migrationInfo => migrationInfo.Version)
+                                           .ToListAsync(cancellationToken);
             }
             catch
             {

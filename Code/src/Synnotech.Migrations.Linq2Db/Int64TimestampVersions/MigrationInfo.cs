@@ -1,10 +1,10 @@
 ﻿using System;
-using Synnotech.Migrations.Core.TextVersions;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
 
-namespace Synnotech.Migrations.Linq2Db.TextVersions
+namespace Synnotech.Migrations.Linq2Db.Int64TimestampVersions
 {
     /// <summary>
-    /// Represents the default migration info for text versions for Linq2Db.
+    /// Represents the default migration info for Int64 timestamps for Linq2Db.
     /// </summary>
     public class MigrationInfo : BaseMigrationInfo
     {
@@ -19,6 +19,6 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <param name="migration">The migration that was executed.</param>
         /// <param name="appliedAt">The point in time when the migration was applied. Use <see cref="DateTime.UtcNow" /> if possible.</param>
         public static MigrationInfo Create(Migration migration, DateTime appliedAt) =>
-            new () { Version = migration.ConvertVersionToString(), Name = migration.Name, AppliedAt = appliedAt };
+            new () { Version = migration.Version, Name = migration.Name, AppliedAt = appliedAt };
     }
 }

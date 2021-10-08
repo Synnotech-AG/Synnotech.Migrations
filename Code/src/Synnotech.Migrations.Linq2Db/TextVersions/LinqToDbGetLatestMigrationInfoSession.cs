@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,7 +42,6 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// when a slot has more than one digit.
         /// </summary>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
-        /// <exception cref="DbException">Thrown when any communication error with the database occurs.</exception>
         public async Task<TMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken = default)
         {
             try
