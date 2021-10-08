@@ -15,18 +15,23 @@ namespace Synnotech.Migrations.RavenDB.TextVersions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers the default migration engine for Raven DB with the DI Container.
+        /// <para>
+        /// Registers the default migration engine for Raven DB with the DI Container. The migration engine uses text versions.
         /// All instances (<see cref="MigrationEngine" />, <see cref="SessionFactory" />, and <see cref="MicrosoftDependencyInjectionMigrationFactory{TMigration}" />)
         /// will be added with a transient lifetime. A registration for <see cref="IDocumentStore" /> must already be present
         /// (usually with a singleton lifetime).
+        /// </para>
+        /// <para>
         /// IMPORTANT: you should not call this method when you run a custom setup -
         /// please register your own types with the DI container in this case.
+        /// </para>
         /// </summary>
         /// <param name="services">The service collection used to register types with the DI container.</param>
         /// <param name="assembliesContainingMigrations">
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
         /// the calling assembly will be searched.
         /// </param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="services"/> is null.</exception>
         public static IServiceCollection AddSynnotechMigrations(this IServiceCollection services, params Assembly[] assembliesContainingMigrations)
         {
             services.MustNotBeNull(nameof(services));

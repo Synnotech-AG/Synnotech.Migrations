@@ -4,22 +4,17 @@
 	<PropertyGroup>
 		<Description>Core implementation of a generic migration engine that can be adapted to any target system.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Core 0.8.0
+Synntech.Migrations.Core 0.9.0
 --------------------------------
 
-- complete redesign of core package
-- the migration engine now knows about the version type that is used to compare migrations
-- the context that is passed to migrations is now decoupled from the migration session
-- the old migration session is gone, there are two new sessions instead (IGetLatestMigrationInfoSession and IMigrationSession)
-- added support for Microsoft.Extensions.DependencyInjection directly to the core
-- you can now inject any dependency into migrations
-- the migration engine will dispose migrations that implement IAsyncDisposable or IDisposable
-- added support for Synnotech.DatabaseAbstractions 2.x
+- added support for Synnotech.DatabaseAbstractions 3.0.0
+- added Int64 timestamp versions as an alternative to text versions
+- added possibility to apply all non-applied migrations, even if their version is lower than your currently highest version
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Synnotech.DatabaseAbstractions" Version="2.0.0" />
+		<PackageReference Include="Synnotech.DatabaseAbstractions" Version="3.0.0" />
 		<PackageReference Include="Light.GuardClauses" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
         <PackageReference Include="Nullable" Version="1.3.0">

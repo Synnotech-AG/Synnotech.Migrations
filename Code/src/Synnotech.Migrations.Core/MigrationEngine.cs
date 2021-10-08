@@ -30,7 +30,7 @@ namespace Synnotech.Migrations.Core
         where TMigrationVersion : IEquatable<TMigrationVersion>, IComparable<TMigrationVersion>
         where TMigration : IMigration<TMigrationContext>, IHasMigrationVersion<TMigrationVersion>
         where TMigrationAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<TMigrationVersion>
-        where TMigrationInfo : IHasMigrationVersion<TMigrationVersion>
+        where TMigrationInfo : class, IHasMigrationVersion<TMigrationVersion>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="MigrationEngine{TMigrationVersion,TMigration,TMigrationAttribute,TMigrationInfo,TMigrationContext}" />.
@@ -65,7 +65,9 @@ namespace Synnotech.Migrations.Core
 
         /// <summary>
         /// Generates a plan that contains information about the latest applied migration on the target system
-        /// and the migrations that need to be applied.
+        /// and newer migrations that need to be applied. This method is usually used on Staging / Production
+        /// systems to update the target system to the newest version. This method is called internally
+        /// by <see cref="MigrateAsync" />.
         /// </summary>
         /// <param name="assembliesContainingMigrations">
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
@@ -73,6 +75,7 @@ namespace Synnotech.Migrations.Core
         /// </param>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <returns>A plan that describes the latest applied migration and the pending migrations.</returns>
+        /// <exception cref="MigrationException">Thrown when the migration infos in your target system are invalid, or when there are several migrations with the same version.</exception>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
         public virtual Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsAsync(Assembly[]? assembliesContainingMigrations = null,
                                                                                                            CancellationToken cancellationToken = default)
@@ -84,17 +87,51 @@ namespace Synnotech.Migrations.Core
         }
 
         private async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNewMigrationsInternal(Assembly[] assembliesContainingMigrations,
-                                                                                                             CancellationToken cancellationToken = default)
+                                                                                                             CancellationToken cancellationToken)
         {
             await using var session = await SessionFactory.CreateSessionForRetrievingLatestMigrationInfoAsync(cancellationToken);
             var latestMigrationInfo = await session.GetLatestMigrationInfoAsync(cancellationToken);
 
-            var latestId = default(TMigrationVersion?);
+            var latestMigrationVersion = default(TMigrationVersion?);
             if (latestMigrationInfo != null)
-                latestId = latestMigrationInfo.GetMigrationVersion();
+                latestMigrationVersion = latestMigrationInfo.GetMigrationVersion();
 
-            var migrationsToBeApplied = PendingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestId, assembliesContainingMigrations);
+            var migrationsToBeApplied = assembliesContainingMigrations.DetermineNewMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(latestMigrationVersion);
             return new MigrationPlan<TMigrationVersion, TMigrationInfo>(latestMigrationInfo, migrationsToBeApplied);
+        }
+
+        /// <summary>
+        /// Generates a plan that contains information about the latest applied migration on the target system
+        /// and all migrations that have not yet been applied (including older ones). This method should only be
+        /// called in development environments, especially to apply migrations that came in from merges of other
+        /// branches and that have a potentially lower version than your latest migration version.
+        /// </summary>
+        /// <param name="assembliesContainingMigrations">
+        /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
+        /// the calling assembly will be searched.
+        /// </param>
+        /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
+        /// <returns>A plan that describes the latest applied migration and the pending migrations.</returns>
+        /// <exception cref="MigrationException">Thrown when the migration infos in your target system are invalid, or when there are several migrations with the same version.</exception>
+        /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
+        public virtual Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNonAppliedMigrationsAsync(Assembly[]? assembliesContainingMigrations = null,
+                                                                                                                  CancellationToken cancellationToken = default)
+        {
+            if (assembliesContainingMigrations.IsNullOrEmpty())
+                assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
+
+            return GetPlanForNonAppliedMigrationsInternal(assembliesContainingMigrations, cancellationToken);
+        }
+
+        private async Task<MigrationPlan<TMigrationVersion, TMigrationInfo>> GetPlanForNonAppliedMigrationsInternal(Assembly[] assembliesContainingMigrations,
+                                                                                                                    CancellationToken cancellationToken)
+        {
+            await using var session = await SessionFactory.CreateSessionForRetrievingAllMigrationInfosAsync(cancellationToken);
+            var appliedMigrationInfos = await session.GetAllMigrationInfosAsync(cancellationToken);
+
+            var (infoWithHighestVersion, allVersions) = appliedMigrationInfos.ExtractMigrationVersions<TMigrationInfo, TMigrationVersion>();
+            var migrationToBeApplied = assembliesContainingMigrations.DetermineNonAppliedMigrations<TMigrationVersion, TMigration, TMigrationAttribute>(allVersions);
+            return new MigrationPlan<TMigrationVersion, TMigrationInfo>(infoWithHighestVersion, migrationToBeApplied);
         }
 
         /// <summary>
@@ -114,25 +151,37 @@ namespace Synnotech.Migrations.Core
         /// The assemblies that will be searched for migration types (optional). If you do not provide any assemblies,
         /// the calling assembly will be searched.
         /// </param>
+        /// <param name="approach">
+        /// The approach that should be taken to apply migrations (optional). The default is to determine the latest migration version
+        /// of the target system and then apply all newer migrations. See the <see cref="MigrationApproach" /> enum for detailed infos.
+        /// </param>
         /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
         /// <returns>A summary of all migrations that have been applied in this run and an optional error that might have occurred during a migration.</returns>
+        /// <exception cref="MigrationException">Thrown when the migration infos in your target system are invalid, or when there are several migrations with the same version.</exception>
         /// <exception cref="Exception">A system-specific exception might occur when there are errors with the connection to the target system (e.g. a SqlException).</exception>
         public virtual Task<MigrationSummary<TMigrationInfo>> MigrateAsync(DateTime? now = null,
                                                                            Assembly[]? assembliesContainingMigrations = null,
+                                                                           MigrationApproach approach = MigrationApproach.MigrationsWithNewerVersions,
                                                                            CancellationToken cancellationToken = default)
         {
             if (assembliesContainingMigrations.IsNullOrEmpty())
                 assembliesContainingMigrations = new[] { Assembly.GetCallingAssembly() };
 
-            return MigrateInternalAsync(now, assembliesContainingMigrations, cancellationToken);
+            return MigrateInternalAsync(now, assembliesContainingMigrations, approach, cancellationToken);
 
             // ReSharper disable VariableHidesOuterVariable
             async Task<MigrationSummary<TMigrationInfo>> MigrateInternalAsync(DateTime? now,
                                                                               Assembly[] assembliesContainingMigrations,
+                                                                              MigrationApproach approach,
                                                                               CancellationToken cancellationToken)
-                // ReSharper restore VariableHidesOuterVariable
+            // ReSharper restore VariableHidesOuterVariable
             {
-                var migrationPlan = await GetPlanForNewMigrationsInternal(assembliesContainingMigrations, cancellationToken);
+
+
+
+                var migrationPlan = approach == MigrationApproach.AllNonAppliedMigrations ?
+                    await GetPlanForNonAppliedMigrationsInternal(assembliesContainingMigrations, cancellationToken) :
+                    await GetPlanForNewMigrationsInternal(assembliesContainingMigrations, cancellationToken);
                 return await ApplyMigrationsAsync(migrationPlan.PendingMigrations, now, cancellationToken);
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Synnotech.DatabaseAbstractions.Mocks;
 using Synnotech.Migrations.Core.TextVersions;
 using Xunit;
 
@@ -27,7 +28,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 new () { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos, config => config.WithStrictOrdering());
-            Context.MustBeCommittedAndDisposed();
+            Context.SaveChangesMustHaveBeenCalled(3)
+                   .MustBeDisposed();
         }
 
         [Fact]
@@ -44,7 +46,8 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
                 new () { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
             };
             appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos);
-            Context.MustBeCommittedAndDisposed();
+            Context.SaveChangesMustHaveBeenCalled()
+                   .MustBeDisposed();
         }
 
         [Fact]
@@ -55,13 +58,32 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             var summary = await RunMigrationAsync();
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
             appliedMigrations.Should().BeNullOrEmpty();
-            Context.MustBeRolledBackAndDisposed();
+            Context.SaveChangesMustNotHaveBeenCalled()
+                   .MustBeDisposed();
         }
 
-        private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync()
+        [Fact]
+        public async Task RunPreviousMigrations()
+        {
+            Context.ExistingMigrationInfos.Add(new TestMigrationInfo { Id = 1, Version = "0.2.0", Name = nameof(Migration2), AppliedAt = UtcNow.AddMinutes(-100)});
+
+            var summary = await RunMigrationAsync(MigrationApproach.AllNonAppliedMigrations);
+
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            var expectedMigrations = new List<TestMigrationInfo>
+            {
+                new () { Id = 2, Version = "0.1.0", Name = nameof(Migration1), AppliedAt = UtcNow },
+                new () { Id = 3, Version = "1.0.0", Name = nameof(Migration3), AppliedAt = UtcNow }
+            };
+            appliedMigrations.Should().BeEquivalentTo(expectedMigrations);
+            Context.SaveChangesMustHaveBeenCalled(2)
+                   .MustBeDisposed();
+        }
+
+        private Task<MigrationSummary<TestMigrationInfo>> RunMigrationAsync(MigrationApproach approach = MigrationApproach.MigrationsWithNewerVersions)
         {
             var engine = new MigrationEngine<TestMigration, TestMigrationInfo, TestContext>(new TestSessionFactory(Context), new ActivatorMigrationFactory<TestMigration>(), MigrationInfoFactory.Create);
-            return engine.MigrateAsync(UtcNow, new[] { typeof(MigrationEngineTests).Assembly });
+            return engine.MigrateAsync(UtcNow, new[] { typeof(MigrationEngineTests).Assembly }, approach);
         }
     }
 
@@ -88,24 +110,17 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         public int Id { get; set; }
     }
 
-
-    public sealed class TestContext : IGetLatestMigrationInfoSession<TestMigrationInfo>, IMigrationSession<TestContext, TestMigrationInfo>
+    public sealed class TestContext : AsyncSessionMock,
+                                      IGetLatestMigrationInfoSession<TestMigrationInfo>,
+                                      IMigrationSession<TestContext, TestMigrationInfo>,
+                                      IGetAllMigrationInfosSession<TestMigrationInfo>
     {
-        public int DisposeCallCount;
-        public TestMigrationInfo? LatestMigrationInfo;
-        public int SaveChangesCallCount;
-        public List<TestMigrationInfo> StoredMigrationInfos = new ();
-
-        public void Dispose() => DisposeCallCount++;
+        public TestMigrationInfo? LatestMigrationInfo { get; set; }
+        public List<TestMigrationInfo> ExistingMigrationInfos { get; set; } = new ();
+        public List<TestMigrationInfo> StoredMigrationInfos { get; } = new ();
 
         public Task<TestMigrationInfo?> GetLatestMigrationInfoAsync(CancellationToken cancellationToken) =>
             Task.FromResult(LatestMigrationInfo);
-
-        public ValueTask DisposeAsync()
-        {
-            Dispose();
-            return default;
-        }
 
         public TestContext Context => this;
 
@@ -115,29 +130,14 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             return default;
         }
 
-        public Task SaveChangesAsync(CancellationToken cancellationToken)
+        public TestContext SaveChangesMustHaveBeenCalled(int times)
         {
-            SaveChangesCallCount++;
-            return Task.CompletedTask;
+            SaveChangesCallCount.Should().Be(times);
+            return this;
         }
 
-        public void MustBeDisposed() => DisposeCallCount.Should().BeGreaterOrEqualTo(1, "Dispose must be called at least once");
-
-        public void MustBeCommitted() => SaveChangesCallCount.Should().BeGreaterOrEqualTo(1, "SaveChanges must have been called.");
-
-        public void MustBeRolledBack() => SaveChangesCallCount.Should().Be(0, "SaveChanges must not have been called.");
-
-        public void MustBeCommittedAndDisposed()
-        {
-            MustBeCommitted();
-            MustBeDisposed();
-        }
-
-        public void MustBeRolledBackAndDisposed()
-        {
-            MustBeRolledBack();
-            MustBeDisposed();
-        }
+        public Task<List<TestMigrationInfo>> GetAllMigrationInfosAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(ExistingMigrationInfos);
     }
 
     public sealed class TestMigrationInfoFactory
@@ -165,5 +165,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         public ValueTask<IGetLatestMigrationInfoSession<TestMigrationInfo>> CreateSessionForRetrievingLatestMigrationInfoAsync(CancellationToken cancellationToken) => new (_testContext);
 
         public ValueTask<IMigrationSession<TestContext, TestMigrationInfo>> CreateSessionForMigrationAsync(TestMigration migration, CancellationToken cancellationToken) => new (_testContext);
+
+        public ValueTask<IGetAllMigrationInfosSession<TestMigrationInfo>> CreateSessionForRetrievingAllMigrationInfosAsync(CancellationToken cancellationToken = default) => new (_testContext);
     }
 }

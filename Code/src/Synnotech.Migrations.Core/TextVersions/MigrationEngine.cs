@@ -3,13 +3,17 @@
 namespace Synnotech.Migrations.Core.TextVersions
 {
     /// <summary>
+    /// <para>
     /// Represents an asynchronous migration engine that uses <see cref="Version" /> instances
     /// to identify and order migrations. The info objects stored in the target system have
     /// to derive from <see cref="BaseMigrationInfo" /> which serializes the version instances
     /// as strings.
+    /// </para>
+    /// <para>
     /// The migration engine searches for migrations in
     /// the target assembly, compares them to the latest applied migration of the target system
     /// and then applies the pending migrations.
+    /// </para>
     /// </summary>
     /// <typeparam name="TMigration">
     /// The base class that identifies all migrations. Must implement <see cref="IMigration{TContext}" /> and

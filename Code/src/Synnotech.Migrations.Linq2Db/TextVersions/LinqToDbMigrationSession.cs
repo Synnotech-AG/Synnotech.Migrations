@@ -10,11 +10,11 @@ using Synnotech.Migrations.Core.TextVersions;
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
-    /// Represents the session that is used to apply migrations and store corresponding migration info via LinqToDB.
+    /// Represents the session that is used to apply a single migration and store a corresponding migration info via LinqToDB.
     /// </summary>
     /// <typeparam name="TDataConnection">Your custom subtype that derives from <see cref="DataConnection" />.</typeparam>
     /// <typeparam name="TMigrationInfo">The type that represents a migration info. It must derive from <see cref="BaseMigrationInfo" />.</typeparam>
-    public class LinqToDbMigrationSession<TDataConnection, TMigrationInfo> : AsyncReadOnlySession<TDataConnection>, IMigrationSession<TDataConnection, TMigrationInfo>
+    public class LinqToDbMigrationSession<TDataConnection, TMigrationInfo> : AsyncSession<TDataConnection>, IMigrationSession<TDataConnection, TMigrationInfo>
         where TMigrationInfo : BaseMigrationInfo
         where TDataConnection : DataConnection
     {
@@ -24,12 +24,6 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public LinqToDbMigrationSession(TDataConnection dataConnection) : base(dataConnection) { }
-
-        /// <summary>
-        /// Commits the underlying transaction, if there is any.
-        /// </summary>
-        public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
-            DataConnection.CommitTransactionAsync(cancellationToken);
 
         /// <summary>
         /// Returns the underlying LinqToDB data connection that is used as the context for migrations.
@@ -46,7 +40,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     }
 
     /// <summary>
-    /// Represents the session that is used to apply migrations and store corresponding migration info via LinqToDB.
+    /// Represents the session that is used to apply a single migration and store a corresponding migration info via LinqToDB.
     /// <see cref="MigrationInfo" /> is used as the type that represents a migration info.
     /// </summary>
     /// <typeparam name="TDataConnection">Your custom subtype that derives from <see cref="DataConnection" />.</typeparam>
@@ -69,10 +63,10 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
     }
 
     /// <summary>
-    /// Represents the session that is used to apply a migration and store the corresponding migration info.
+    /// Represents the session that is used to apply a single migration and store a corresponding migration info via LinqToDB.
     /// <see cref="MigrationInfo" /> is used as the type that represents a migration info.
     /// </summary>
-    public class LinqToDbMigrationSession : LinqToDbMigrationSession<DataConnection>
+    public sealed class LinqToDbMigrationSession : LinqToDbMigrationSession<DataConnection>
     {
         /// <summary>
         /// Initializes a new instance of <see cref="LinqToDbMigrationSession" />.

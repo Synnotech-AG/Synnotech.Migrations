@@ -4,7 +4,7 @@ using Synnotech.Migrations.Core.TextVersions;
 namespace Synnotech.Migrations.Linq2Db.TextVersions
 {
     /// <summary>
-    /// Represents the default migration info for Linq2Db.
+    /// Represents the default migration info for text versions for Linq2Db.
     /// </summary>
     public class MigrationInfo : BaseMigrationInfo
     {

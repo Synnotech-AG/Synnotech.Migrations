@@ -36,7 +36,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
 
         /// <summary>
         /// Executes the migration. Interactions with the target system can be performed
-        /// using the specified session.
+        /// using the specified data connection.
         /// IMPORTANT: you usually should not call 'dataConnection.CommitTransactionAsync' or something
         /// similar as this is handled by the migration engine.
         /// You can set <see cref="IsRequiringTransaction" /> to false to handle transactions yourself

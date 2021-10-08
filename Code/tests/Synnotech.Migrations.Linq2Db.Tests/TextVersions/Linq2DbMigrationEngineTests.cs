@@ -31,7 +31,7 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
 
             var now = DateTime.UtcNow;
             var summary = await migrationEngine.MigrateAsync(now);
-            LogSummary(summary);
+            Output.LogSummary(summary);
 
             await using var dataConnection = container.GetRequiredService<DataConnection>();
             var migrationInfos = await dataConnection.GetTable<MigrationInfo>()
@@ -58,7 +58,7 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
             var now = DateTime.UtcNow;
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
             var summary = await migrationEngine.MigrateAsync(now);
-            LogSummary(summary);
+            Output.LogSummary(summary);
 
             var expectedMigration = new List<MigrationInfo>
             {
@@ -83,11 +83,34 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
 
             var migrationEngine = container.GetRequiredService<MigrationEngine>();
             var summary = await migrationEngine.MigrateAsync(now);
-            LogSummary(summary);
+            Output.LogSummary(summary);
 
             summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeFalse();
             appliedMigrations.Should().BeNull();
             summary.EnsureSuccess();
+        }
+
+        [SkippableFact]
+        public async Task RunPreviousMigrations()
+        {
+            await using var container = await InitializeOrSkipTestAsync();
+            var now = DateTime.UtcNow;
+            await using (var dataConnection = container.GetRequiredService<DataConnection>())
+            {
+                await dataConnection.CreateTableAsync<MigrationInfo>();
+                await dataConnection.InsertAsync(new MigrationInfo { Name = nameof(AddFirstMasterDataEntry), Version = "0.2.0", AppliedAt = now.AddDays(-2) });
+            }
+
+            var migrationEngine = container.GetRequiredService<MigrationEngine>();
+            var summary = await migrationEngine.MigrateAsync(now, approach: MigrationApproach.AllNonAppliedMigrations);
+            Output.LogSummary(summary);
+
+            summary.TryGetAppliedMigrations(out var appliedMigrations).Should().BeTrue();
+            var expectedMigrationInfos = new List<MigrationInfo>
+            {
+                new () { Id = 2, Name = nameof(InitialTableStructure), Version = "0.1.0", AppliedAt = now }
+            };
+            appliedMigrations.Should().BeEquivalentTo(expectedMigrationInfos);
         }
 
         private static async Task<ServiceProvider> InitializeOrSkipTestAsync()
@@ -97,22 +120,6 @@ namespace Synnotech.Migrations.Linq2Db.Tests.TextVersions
             return new ServiceCollection().AddDatabaseContext(connectionString, sqlServerVersion)
                                           .AddSynnotechMigrations()
                                           .BuildServiceProvider();
-        }
-
-        private void LogSummary(MigrationSummary<MigrationInfo> summary)
-        {
-            if (summary.TryGetAppliedMigrations(out var appliedMigrations))
-            {
-                foreach (var appliedMigration in appliedMigrations)
-                {
-                    Output.WriteLine(appliedMigration.ToString());
-                }
-            }
-
-            Output.WriteLine(string.Empty);
-
-            if (summary.TryGetError(out var error))
-                Output.WriteLine(error.Exception.ToString());
         }
     }
 

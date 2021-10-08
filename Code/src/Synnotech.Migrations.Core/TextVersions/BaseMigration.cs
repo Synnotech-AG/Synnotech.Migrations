@@ -8,7 +8,7 @@ namespace Synnotech.Migrations.Core.TextVersions
 {
     /// <summary>
     /// Base class for migrations that use the <see cref="MigrationVersionAttribute" /> to indicate
-    /// the migration version.
+    /// the migration version as a string that can be parsed as a <see cref="Version" /> instance.
     /// </summary>
     public abstract class BaseMigration : BaseMigration<Version, MigrationVersionAttribute>
     {

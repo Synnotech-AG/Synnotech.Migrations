@@ -45,7 +45,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
             };
 
         private static List<PendingMigration<Version>>? DetermineMigrations(Version? latestVersion) =>
-            PendingMigrations.DetermineNewMigrations<Version, MigrationDummy, MigrationVersionAttribute>(latestVersion, typeof(PendingMigrationsTests).Assembly);
+            new [] { typeof(PendingMigrationsTests).Assembly }.DetermineNewMigrations<Version, MigrationDummy, MigrationVersionAttribute>(latestVersion);
 
         public abstract class MigrationDummy : BaseMigration { }
 
@@ -61,7 +61,7 @@ namespace Synnotech.Migrations.Core.Tests.TextVersions
         [Fact]
         public static void ThrowOnInvalidMigrationVersion()
         {
-            Action act = () => PendingMigrations.DetermineNewMigrations<Version, InvalidBaseMigration, MigrationVersionAttribute>(null, typeof(InvalidMigration).Assembly);
+            Action act = () => new [] { typeof(PendingMigrationsTests).Assembly }.DetermineNewMigrations<Version, InvalidBaseMigration, MigrationVersionAttribute>(null);
 
             act.Should().Throw<MigrationException>()
                .And.Message.Should().Be($"The specified version \"some invalid value\" of migration \"{typeof(InvalidMigration)}\" cannot be parsed.");

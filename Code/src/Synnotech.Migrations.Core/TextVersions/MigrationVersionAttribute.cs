@@ -5,6 +5,8 @@ namespace Synnotech.Migrations.Core.TextVersions
 {
     /// <summary>
     /// Represents the version of a migration that can be obtained via reflection.
+    /// The version is a <see cref="string" /> that will be parsed to a <see cref="Version" />
+    /// instance.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class MigrationVersionAttribute : Attribute, IMigrationAttribute, IHasMigrationVersion<Version>

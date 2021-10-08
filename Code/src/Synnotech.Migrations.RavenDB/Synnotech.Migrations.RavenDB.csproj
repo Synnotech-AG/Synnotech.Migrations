@@ -1,18 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
+
+	<!-- Please have a look at the Directory.Build.props files to see which properties are set additionally accross different projects -->
+
+    <PropertyGroup>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for RavenDB</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.RavenDB 0.8.0
+Synntech.Migrations.RavenDB 0.9.0
 ---------------------------------
 
-- adapted new implementation of Synnotech.Migrations.Core
-- added support for dependency injection as well as IAsyncDisposable and IDisposable for migrations
-- added support for Synnotech.DatabaseAbstractions 2.x
+- added support for Synnotech.RavenDB 3.0.0
+- added Int64 timestamp versions as an alternative to text versions
+- added possibility to apply all non-applied migrations, even if their version is lower than your currently highest version
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="Synnotech.RavenDB" Version="2.0.0" />
+		<PackageReference Include="Synnotech.RavenDB" Version="3.0.0" />
 	</ItemGroup>
 </Project>
