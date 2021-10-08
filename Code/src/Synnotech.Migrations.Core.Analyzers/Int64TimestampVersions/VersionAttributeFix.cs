@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -25,6 +26,8 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         /// <inheritdoc />
         public override FixAllProvider? GetFixAllProvider() => null;
 
+        public DateTime? PredefinedDateTime { get; set; }
+
         /// <inheritdoc />
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -35,18 +38,61 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
             var targetNode = compilationUnit.FindNode(diagnostic.Location.SourceSpan);
             var classSyntax = (ClassDeclarationSyntax) targetNode;
 
-            var title = diagnostic.Descriptor.Title.ToString();
-            context.RegisterCodeFix(CodeAction.Create(title,
-                                                      _ => AddMigrationVersionAttribute(context.Document, compilationUnit, classSyntax),
-                                                      title),
+            var descriptorTitle = diagnostic.Descriptor.Title.ToString();
+            var iso8601StringTimestampTitle = descriptorTitle + " as ISO 8601 string timestamp";
+            context.RegisterCodeFix(CodeAction.Create(iso8601StringTimestampTitle,
+                                                      _ => AddMigrationVersionAttributeInIso8601TimestampFormat(context.Document, compilationUnit, classSyntax),
+                                                      iso8601StringTimestampTitle),
+                                    diagnostic);
+            var int64TimestampTitle = descriptorTitle + " as Int64 timestamp";
+            context.RegisterCodeFix(CodeAction.Create(int64TimestampTitle,
+                                                      _ => AddMigrationVersionAttributeInInt64TimestampFormat(context.Document, compilationUnit, classSyntax),
+                                                      int64TimestampTitle),
                                     diagnostic);
         }
 
-        private static Task<Document> AddMigrationVersionAttribute(Document document, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclarationSyntax)
+        private Task<Document> AddMigrationVersionAttributeInIso8601TimestampFormat(Document document, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclarationSyntax)
         {
-            var timestamp = DateTime.UtcNow.ToIso8601UtcString();
+            var timestamp = GetDateTime().ToIso8601UtcString();
+            return InsertAttributeAndUsingStatement(document, syntaxRoot, classDeclarationSyntax, timestamp);
+        }
 
-            // Add the attribute to the class
+        private Task<Document> AddMigrationVersionAttributeInInt64TimestampFormat(Document document, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclarationSyntax)
+        {
+            var timestamp = GetDateTime().ToInt64Timestamp();
+            return InsertAttributeAndUsingStatement(document, syntaxRoot, classDeclarationSyntax, timestamp);
+        }
+
+        private static Task<Document> InsertAttributeAndUsingStatement<T>(Document document, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclarationSyntax, T timestamp)
+        {
+            syntaxRoot = InsertMigrationVersionAttribute(syntaxRoot, classDeclarationSyntax, timestamp);
+            syntaxRoot = InsertUsingStatementIfNecessary(syntaxRoot);
+            return Task.FromResult(document.WithSyntaxRoot(syntaxRoot));
+        }
+
+        private DateTime GetDateTime() => PredefinedDateTime ?? DateTime.UtcNow;
+
+        private static CompilationUnitSyntax InsertMigrationVersionAttribute<T>(CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclarationSyntax, T timestamp)
+        {
+            SyntaxToken literal;
+            SyntaxKind syntaxKind;
+            if (typeof(T) == typeof(long))
+            {
+                var value = Unsafe.As<T, long>(ref timestamp);
+                literal = Literal(value);
+                syntaxKind = SyntaxKind.NumericLiteralExpression;
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                var value = Unsafe.As<T, string>(ref timestamp);
+                literal = Literal(value);
+                syntaxKind = SyntaxKind.StringLiteralExpression;
+            }
+            else
+            {
+                throw new ArgumentException("timestamp can either be a string or a long value", nameof(timestamp));
+            }
+
             var newClassDeclarationSyntax =
                 classDeclarationSyntax
                    .AddAttributeLists(
@@ -58,15 +104,16 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                                         AttributeArgumentList(
                                             SingletonSeparatedList(
                                                 AttributeArgument(
-                                                    LiteralExpression(
-                                                        SyntaxKind.StringLiteralExpression,
-                                                        Literal(timestamp)))))))))
+                                                    LiteralExpression(syntaxKind, literal))))))))
                    .NormalizeWhitespace();
 
             syntaxRoot = syntaxRoot.ReplaceNode(classDeclarationSyntax, newClassDeclarationSyntax)
                                    .NormalizeWhitespace();
+            return syntaxRoot;
+        }
 
-            // Check if the using directive must be inserted
+        private static CompilationUnitSyntax InsertUsingStatementIfNecessary(CompilationUnitSyntax syntaxRoot)
+        {
             if (syntaxRoot.DescendantNodes()
                           .OfType<UsingDirectiveSyntax>()
                           .All(usingDirective => !usingDirective.Name.EqualsInt64TimestampsNamespace()))
@@ -85,7 +132,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
                        .NormalizeWhitespace();
             }
 
-            return Task.FromResult(document.WithSyntaxRoot(syntaxRoot));
+            return syntaxRoot;
         }
     }
 }

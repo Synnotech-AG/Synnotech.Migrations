@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -33,6 +31,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Tests
         public static async Task<string> ApplyFixAsync(this CodeFixProvider codeFixProvider,
                                                        string code,
                                                        DiagnosticAnalyzer analyzer,
+                                                       int actionIndex = 0,
                                                        [CallerMemberName] string? projectName = null)
         {
             projectName = projectName.MustNotBeNull(nameof(projectName));
@@ -47,7 +46,7 @@ namespace Synnotech.Migrations.Core.Analyzers.Tests
                                              (action, diagnostic) => codeActions.Add(action),
                                              CancellationToken.None);
             await codeFixProvider.RegisterCodeFixesAsync(context);
-            document = (await codeActions[0].GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>()
+            document = (await codeActions[actionIndex].GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>()
                                                                                         .Single()
                                                                                         .ChangedSolution
                                                                                         .GetDocument(document.Id);
