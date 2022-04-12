@@ -4,22 +4,17 @@
 	<PropertyGroup>
 		<Description>Core implementation of a generic migration engine that can be adapted to any target system.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Core 0.9.0
+Synntech.Migrations.Core 0.10.1
 --------------------------------
 
-- added support for Synnotech.DatabaseAbstractions 3.0.0
-- added Int64 timestamp versions as an alternative to text versions
-- added possibility to apply all non-applied migrations, even if their version is lower than your currently highest version
+- Fixed bug in Linq2Db where the latest migration info was not determined correctly by LinqToDbGetLatestMigrationInfoSession for TextVersions (Issue-7)
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Synnotech.DatabaseAbstractions" Version="3.0.0" />
-		<PackageReference Include="Light.GuardClauses" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-        <PackageReference Include="Nullable" Version="1.3.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
+		<PackageReference Include="Light.GuardClauses" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Nullable" Version="1.3.0" PrivateAssets="all" />
 	</ItemGroup>
 </Project>

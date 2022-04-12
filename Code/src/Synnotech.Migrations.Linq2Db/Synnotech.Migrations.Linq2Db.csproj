@@ -2,18 +2,16 @@
 	<PropertyGroup>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Linq2Db 0.9.0
+Synntech.Migrations.Linq2Db 0.10.1
 ---------------------------------
 
-- added support for Synnotech.Linq2Db 6.0.0
-- added Int64 timestamp versions as an alternative to text versions
-- added possibility to apply all non-applied migrations, even if their version is lower than your currently highest version
+- Fixed bug where the latest migration info was not determined correctly by LinqToDbGetLatestMigrationInfoSession for TextVersions (Issue-7)
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
 		<PackageReference Include="Synnotech.Linq2Db" Version="6.0.0" />
 	</ItemGroup>

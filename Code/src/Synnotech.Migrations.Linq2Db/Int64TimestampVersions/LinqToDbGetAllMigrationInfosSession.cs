@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace Synnotech.Migrations.Linq2Db.Int64TimestampVersions
         /// Initializes a new instance of <see cref="LinqToDbGetAllMigrationInfosSession{TMigrationInfo}" />.
         /// </summary>
         /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public LinqToDbGetAllMigrationInfosSession(DataConnection dataConnection) : base(dataConnection) { }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace Synnotech.Migrations.Linq2Db.Int64TimestampVersions
         /// Initializes a new instance of <see cref="LinqToDbGetAllMigrationInfosSession" />.
         /// </summary>
         /// <param name="dataConnection">The LinqToDB data connection used to interact with the database.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataConnection" /> is null.</exception>
         public LinqToDbGetAllMigrationInfosSession(DataConnection dataConnection) : base(dataConnection) { }
     }
 }
