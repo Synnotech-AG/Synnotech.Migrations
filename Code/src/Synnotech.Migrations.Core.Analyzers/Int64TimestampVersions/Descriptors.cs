@@ -16,11 +16,11 @@ namespace Synnotech.Migrations.Core.Analyzers.Int64TimestampVersions
         /// Gets the diagnostic descriptor for rule SM1000
         /// </summary>
         public static readonly DiagnosticDescriptor MissingMigrationVersionAttribute =
-            new ("SM1000",
-                 "Apply the Int64Timestamp Migration Version",
-                 "This migration will not be picked up by the migration engine because the migration version attribute is missing",
-                 Category,
-                 DiagnosticSeverity.Info,
-                 true);
+            new DiagnosticDescriptor("SM1000",
+                                     "Apply the Int64Timestamp Migration Version",
+                                     "This migration will not be picked up by the migration engine because the migration version attribute is missing",
+                                     Category,
+                                     DiagnosticSeverity.Info,
+                                     true);
     }
 }
