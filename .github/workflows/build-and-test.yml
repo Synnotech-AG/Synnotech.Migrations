@@ -24,6 +24,6 @@ jobs:
     - name: Test Synnotech.Migrations.Core
       run: dotnet test ./Code/tests/Synnotech.Migrations.Core.Tests/Synnotech.Migrations.Core.Tests.csproj -c Release --no-build --verbosity normal
     - name: Copy Test Settings for Synnotech.Migrations.RavenDB
-      run: cp ./.github/workflows/testsettings.Build.RavenDB.json ./Code/tests/Synnotech.Migrations.RavenDB.Tests/bin/Release/net5.0/testsettings.Build.json
+      run: cp ./.github/workflows/testsettings.Build.RavenDB.json ./Code/tests/Synnotech.Migrations.RavenDB.Tests/bin/Release/net6.0/testsettings.Build.json
     - name: Test Synnotech.Migrations.RavenDB
       run: dotnet test ./Code/tests/Synnotech.Migrations.RavenDB.Tests/Synnotech.Migrations.RavenDB.Tests.csproj -c Release --no-build --verbosity normal
