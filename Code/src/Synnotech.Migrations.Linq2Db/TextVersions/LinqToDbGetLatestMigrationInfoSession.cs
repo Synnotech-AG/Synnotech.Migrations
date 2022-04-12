@@ -47,7 +47,7 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
             try
             {
                 var migrationInfos = await DataConnection.GetTable<TMigrationInfo>()
-                                                         .OrderBy(migrationInfo => migrationInfo.AppliedAt)
+                                                         .OrderByDescending(migrationInfo => migrationInfo.AppliedAt)
                                                          .Take(Take)
                                                          .ToListAsync(cancellationToken);
                 return migrationInfos.GetLatestMigrationInfo();
