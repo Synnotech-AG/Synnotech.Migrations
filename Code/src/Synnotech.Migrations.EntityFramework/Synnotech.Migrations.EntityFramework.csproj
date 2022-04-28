@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
+		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for EntityFramework.</Description>
+		<PackageReleaseNotes>
+Synnotech.Migrations.EntityFramework 0.1.0
+---------------------------------
+
+- you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
+		</PackageReleaseNotes>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
+		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
+		<PackageReference Include="Synnotech.EntityFramework" Version="0.2.0" />
+	</ItemGroup>
+</Project>

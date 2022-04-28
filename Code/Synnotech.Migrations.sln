@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Core.Analyzers", "src\Synnotech.Migrations.Core.Analyzers\Synnotech.Migrations.Core.Analyzers.csproj", "{6F99625B-463F-4849-827D-B30650347E11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synnotech.Migrations.Core.Analyzers.Tests", "tests\Synnotech.Migrations.Core.Analyzers.Tests\Synnotech.Migrations.Core.Analyzers.Tests.csproj", "{9AE6B8C1-B074-46D1-A456-D82A1D75F46D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Core.Analyzers.Tests", "tests\Synnotech.Migrations.Core.Analyzers.Tests\Synnotech.Migrations.Core.Analyzers.Tests.csproj", "{9AE6B8C1-B074-46D1-A456-D82A1D75F46D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27B89606-498A-441A-B748-481A372D72D1}"
 	ProjectSection(SolutionItems) = preProject
@@ -41,6 +41,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EED9E0EE
 		tests\AssemblyInfos.cs = tests\AssemblyInfos.cs
 		tests\Directory.Build.props = tests\Directory.Build.props
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.EntityFramework", "src\Synnotech.Migrations.EntityFramework\Synnotech.Migrations.EntityFramework.csproj", "{C50A0AF7-2237-4FF6-95A8-64226113F60D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFramework", "EntityFramework", "{B8AA07C9-997A-4FA9-95DD-AC74CD941658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +84,10 @@ Global
 		{9AE6B8C1-B074-46D1-A456-D82A1D75F46D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AE6B8C1-B074-46D1-A456-D82A1D75F46D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AE6B8C1-B074-46D1-A456-D82A1D75F46D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +101,7 @@ Global
 		{9AE6B8C1-B074-46D1-A456-D82A1D75F46D} = {4B9690D6-023F-4BD8-97DB-3C454604CD47}
 		{10DA5542-4A91-4E7E-94DC-9A76ED8E48C1} = {27B89606-498A-441A-B748-481A372D72D1}
 		{EED9E0EE-51C9-495D-84D3-948ED93C1039} = {27B89606-498A-441A-B748-481A372D72D1}
+		{C50A0AF7-2237-4FF6-95A8-64226113F60D} = {B8AA07C9-997A-4FA9-95DD-AC74CD941658}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {87DD232F-65EB-409A-AD28-607B3418E8D9}
