@@ -46,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.Entity
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFramework", "EntityFramework", "{B8AA07C9-997A-4FA9-95DD-AC74CD941658}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synnotech.Migrations.EntityFramework.Tests", "tests\Synnotech.Migrations.EntityFramework.Tests\Synnotech.Migrations.EntityFramework.Tests.csproj", "{88302925-91D3-4F4D-84E4-741CCB98E3A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C50A0AF7-2237-4FF6-95A8-64226113F60D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88302925-91D3-4F4D-84E4-741CCB98E3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88302925-91D3-4F4D-84E4-741CCB98E3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88302925-91D3-4F4D-84E4-741CCB98E3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88302925-91D3-4F4D-84E4-741CCB98E3A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{10DA5542-4A91-4E7E-94DC-9A76ED8E48C1} = {27B89606-498A-441A-B748-481A372D72D1}
 		{EED9E0EE-51C9-495D-84D3-948ED93C1039} = {27B89606-498A-441A-B748-481A372D72D1}
 		{C50A0AF7-2237-4FF6-95A8-64226113F60D} = {B8AA07C9-997A-4FA9-95DD-AC74CD941658}
+		{88302925-91D3-4F4D-84E4-741CCB98E3A1} = {B8AA07C9-997A-4FA9-95DD-AC74CD941658}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {87DD232F-65EB-409A-AD28-607B3418E8D9}

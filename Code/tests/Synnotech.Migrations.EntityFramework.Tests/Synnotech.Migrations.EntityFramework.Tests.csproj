@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Synnotech.Migrations.EntityFramework\Synnotech.Migrations.EntityFramework.csproj" />
+		<PackageReference Include="Synnotech.MsSqlServer" Version="1.1.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="testsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<Compile Include="..\AssemblyInfos.cs">
+			<Link>AssemblyInfos.cs</Link>
+		</Compile>
+		<EmbeddedResource Include="Int64TimestampVersions\InitialScript.sql" />
+		<Analyzer Include="..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll" Condition="Exists('..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll')" />
+	</ItemGroup>
+</Project>
