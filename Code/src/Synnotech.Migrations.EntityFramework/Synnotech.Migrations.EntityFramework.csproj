@@ -3,9 +3,10 @@
 		<TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for EntityFramework.</Description>
 		<PackageReleaseNotes>
-Synnotech.Migrations.EntityFramework 0.1.0
+Synnotech.Migrations.EntityFramework 0.10.1
 ---------------------------------
 
+- initial release 🥳🎈🎉
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>
