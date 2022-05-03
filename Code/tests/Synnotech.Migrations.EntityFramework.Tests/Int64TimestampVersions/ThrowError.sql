@@ -1,0 +1,1 @@
+﻿THROW 50001, 'This error is thrown on purpose', 1;

@@ -1,0 +1,6 @@
+﻿{
+    // Please do not change this file. You can create a separate testsettings.Development.json file
+    // to overwrite the settings in this file.
+    "runDatabaseIntegrationTests": false,
+    "connectionString": "Server=(localdb)\\MsSqlLocalDB;Database=SynnotechMigrationsEntityFrameworkTests;Integrated Security=True"
+}
