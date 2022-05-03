@@ -8,7 +8,7 @@ namespace Synnotech.Migrations.EntityFramework;
 /// a database context that contains a table with all applied migrations.
 /// </summary>
 /// <typeparam name="TMigrationInfo">The type that represents the migration info in the database.</typeparam>
-public interface IHasMigrationInfoTable<TMigrationInfo>
+public interface IHasMigrationInfos<TMigrationInfo>
     where TMigrationInfo : BaseMigrationInfo
 {
     /// <summary>

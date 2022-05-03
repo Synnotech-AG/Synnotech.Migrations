@@ -14,7 +14,7 @@ namespace Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
 /// <typeparam name="TDbContext">Your custom DbContext that derives from <see cref="DbContext" />.</typeparam>
 /// <typeparam name="TMigrationInfo">The type that represents a migration info. It must derive from <see cref="BaseMigrationInfo" />.</typeparam>
 public class EntityFrameworkMigrationSession<TDbContext, TMigrationInfo> : IMigrationSession<TDbContext, TMigrationInfo>
-    where TDbContext : DbContext, IHasMigrationInfoTable<TMigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<TMigrationInfo>
     where TMigrationInfo : BaseMigrationInfo
 {
     /// <summary>
@@ -67,7 +67,7 @@ public class EntityFrameworkMigrationSession<TDbContext, TMigrationInfo> : IMigr
 /// </summary>
 /// <typeparam name="TDbContext">Your custom subtype that derives from <see cref="DbContext" />.</typeparam>
 public class EntityFrameworkMigrationSession<TDbContext> : EntityFrameworkMigrationSession<TDbContext, MigrationInfo>
-    where TDbContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<MigrationInfo>
 {
     /// <summary>
     /// Initializes a new instance of <see cref="EntityFrameworkMigrationSession{TDbContext}" />.

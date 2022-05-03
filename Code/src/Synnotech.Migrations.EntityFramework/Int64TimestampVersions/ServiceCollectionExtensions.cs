@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static IServiceCollection AddSynnotechMigrations<TDbContext>(this IServiceCollection services,
                                                                         params Assembly[] assembliesContainingMigrations)
-        where TDbContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+        where TDbContext : DbContext, IHasMigrationInfos<MigrationInfo>
     {
         services.MustNotBeNull(nameof(services));
 

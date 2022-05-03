@@ -14,9 +14,9 @@ namespace Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
 /// Represents the session that retrieves all migration infos for EntityFramework.
 /// </summary>
 /// <typeparam name="TMigrationInfo">The type that represents a migration info. It must derive from <see cref="BaseMigrationInfo" />.</typeparam>
-/// <typeparam name="TDbContext">The type of the database context. It must derive from <see cref="DbContext" /> and implement <see cref="IHasMigrationInfoTable{TMigrationInfo}" />.</typeparam>
+/// <typeparam name="TDbContext">The type of the database context. It must derive from <see cref="DbContext" /> and implement <see cref="IHasMigrationInfos{TMigrationInfo}" />.</typeparam>
 public class EntityFrameworkGetAllMigrationInfosSession<TDbContext, TMigrationInfo> : AsyncReadOnlySession<TDbContext>, IGetAllMigrationInfosSession<TMigrationInfo>
-    where TDbContext : DbContext, IHasMigrationInfoTable<TMigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<TMigrationInfo>
     where TMigrationInfo : BaseMigrationInfo
 {
     /// <summary>
@@ -50,7 +50,7 @@ public class EntityFrameworkGetAllMigrationInfosSession<TDbContext, TMigrationIn
 /// <see cref="MigrationInfo" /> is used as the the type that represents stored migration infos.
 /// </summary>
 public sealed class EntityFrameworkGetAllMigrationInfosSession<TDbContext> : EntityFrameworkGetAllMigrationInfosSession<TDbContext, MigrationInfo>
-    where TDbContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<MigrationInfo>
 {
     /// <summary>
     /// Initializes a new instance of <see cref="EntityFrameworkGetAllMigrationInfosSession{TDbContext,TMigrationInfo}" />.

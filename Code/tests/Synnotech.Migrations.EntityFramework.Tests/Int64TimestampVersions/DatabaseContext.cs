@@ -3,7 +3,7 @@ using Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
 
 namespace Synnotech.Migrations.EntityFramework.Tests.Int64TimestampVersions;
 
-public class DatabaseContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+public class DatabaseContext : DbContext, IHasMigrationInfos<MigrationInfo>
 {
     static DatabaseContext()
     {

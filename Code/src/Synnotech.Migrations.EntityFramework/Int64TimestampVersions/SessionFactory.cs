@@ -12,7 +12,7 @@ namespace Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
 /// Represents the default factory for creating EntityFramework migration sessions that support text versions.
 /// </summary>
 public sealed class SessionFactory<TDbContext> : ISessionFactory<MigrationInfo, Migration<TDbContext>, TDbContext>
-    where TDbContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<MigrationInfo>
 {
     /// <summary>
     /// Initializes a new instance of <see cref="SessionFactory{TDbContext}" />.

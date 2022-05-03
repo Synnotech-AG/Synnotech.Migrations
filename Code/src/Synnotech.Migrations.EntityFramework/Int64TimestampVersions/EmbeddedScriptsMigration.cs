@@ -14,7 +14,7 @@ namespace Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
 /// namespace as your deriving migration class.
 /// </summary>
 public abstract class EmbeddedScriptsMigration<TDbContext> : Migration<TDbContext>
-    where TDbContext : DbContext, IHasMigrationInfoTable<MigrationInfo>
+    where TDbContext : DbContext, IHasMigrationInfos<MigrationInfo>
 {
     /// <summary>
     /// Initializes a new instance of <see cref="EmbeddedScriptsMigration{TDbContext}" />
