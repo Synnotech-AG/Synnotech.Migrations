@@ -21,5 +21,5 @@ public class MigrationInfo : BaseMigrationInfo
     /// <param name="appliedAt">The point in time when the migration was applied. Use <see cref="DateTime.UtcNow" /> if possible.</param>
     public static MigrationInfo Create<TDbContext>(Migration<TDbContext> migration, DateTime appliedAt)
         where TDbContext : DbContext
-        => new() { Version = migration.Version, Name = migration.Name, AppliedAt = appliedAt };
+        => new () { Version = migration.Version, Name = migration.Name, AppliedAt = appliedAt };
 }

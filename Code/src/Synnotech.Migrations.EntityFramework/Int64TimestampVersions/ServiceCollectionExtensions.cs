@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// <para>
-    /// Registers the default migration engine for EntityFramework with the DI container. This includes the types <see cref="MigrationEngine{TMigration,TMigrationInfo,TMigrationContext}" />,
+    /// Registers the default migration engine for EntityFramework with the DI container. This includes the types <see cref="MigrationEngine{TDbContext}" />,
     /// <see cref="SessionFactory{TDbContext}" />, the <see cref="MicrosoftDependencyInjectionMigrationFactory{TMigration}" /> and <see cref="MigrationInfo.Create{TDbContext}" /> as
     /// a delegate - all of them use transient lifetimes.
     /// Additionally, all instantiatable types that derive from <see cref="Migration{TDbContext}" /> will be registered with the DI container. This way you can
@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     /// </para>
     /// <para>
     /// The session factory requires a Func&lt;TDbContext&gt; to be already registered with the DI container.
-    /// This is used to resolve a data connection when constructing session instances.
+    /// This is used to resolve a database context when constructing session instances.
     /// </para>
     /// <para>
     /// IMPORTANT: you should not call this method when you run a custom setup -

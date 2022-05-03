@@ -39,7 +39,7 @@ public abstract class Migration<TDbContext> : BaseMigration, IMigration<TDbConte
     /// IMPORTANT: you usually should not call 'dbContext.SaveChangesAsync' or something
     /// similar as this is handled by the migration engine.
     /// </summary>
-    /// <param name="dbContext">>The EntityFramework database context that is used to interact with the target database.</param>
+    /// <param name="context">>The EntityFramework database context that is used to interact with the target database.</param>
     /// <param name="cancellationToken">The token to cancel this asynchronous operation (optional).</param>
-    public abstract Task ApplyAsync(TDbContext dbContext, CancellationToken cancellationToken = default);
+    public abstract Task ApplyAsync(TDbContext context, CancellationToken cancellationToken = default);
 }

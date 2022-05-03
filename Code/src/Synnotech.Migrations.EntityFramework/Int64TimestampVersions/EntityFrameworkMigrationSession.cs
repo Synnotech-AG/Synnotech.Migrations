@@ -2,7 +2,6 @@
 using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
-using Synnotech.EntityFramework;
 using Synnotech.Migrations.Core;
 using Synnotech.Migrations.Core.Int64TimestampVersions;
 

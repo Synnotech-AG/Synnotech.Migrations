@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Synnotech.Migrations.Core;
-using Synnotech.Migrations.EntityFramework.Tests.Int64TimestampVersions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Synnotech.Migrations.Core.Int64TimestampVersions;
-using Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
-using Xunit.Abstractions;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Light.EmbeddedResources;
+using Microsoft.Extensions.DependencyInjection;
+using Synnotech.Migrations.Core;
+using Synnotech.Migrations.Core.Int64TimestampVersions;
+using Synnotech.Migrations.EntityFramework.Int64TimestampVersions;
+using Synnotech.Migrations.EntityFramework.Tests.Int64TimestampVersions;
+using Xunit.Abstractions;
 
 namespace Synnotech.Migrations.EntityFramework.Tests;
 
@@ -32,7 +32,7 @@ public static class Extensions
     }
 
     public static IServiceCollection AddDatabaseContext(this IServiceCollection services, string connectionString) =>
-        services.AddTransient(c => new DatabaseContext(connectionString))
+        services.AddTransient(_ => new DatabaseContext(connectionString))
                 .AddSingleton<Func<DatabaseContext>>(c => c.GetRequiredService<DatabaseContext>);
 
     public static async Task<MigrationSummary<MigrationInfo>> ApplyMigrationsFromTestClass<T>(
@@ -51,9 +51,9 @@ public static class Extensions
             }
         }
 
-        var migrationPlan = approach == MigrationApproach.MigrationsWithNewerVersions
-            ? await migrationEngine.GetPlanForNewMigrationsAsync()
-            : await migrationEngine.GetPlanForNonAppliedMigrationsAsync();
+        var migrationPlan = approach == MigrationApproach.MigrationsWithNewerVersions ?
+                                await migrationEngine.GetPlanForNewMigrationsAsync() :
+                                await migrationEngine.GetPlanForNonAppliedMigrationsAsync();
 
         var pendingMigrations = migrationPlan.PendingMigrations!
                                              .Intersect(testMigrations)
