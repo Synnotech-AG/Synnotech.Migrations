@@ -3,6 +3,6 @@
     // to overwrite the settings in this file.
     "runDatabaseIntegrationTests": false,
     "ravenDbOptions": {
-        "frameworkVersion": "6.0.3"
+        "frameworkVersion": "6.0.8"
     }
 }

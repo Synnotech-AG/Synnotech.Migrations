@@ -20,8 +20,8 @@ namespace Synnotech.Migrations.Linq2Db.TextVersions
         /// <see cref="SessionFactory" />, the <see cref="MicrosoftDependencyInjectionMigrationFactory{Migration}" /> and <see cref="MigrationInfo.Create" /> as
         /// a delegate - all of them use transient lifetimes.
         /// Additionally, all instantiatable types that derive from <see cref="Migration" /> will be registered with the DI container. This way you can
-        /// use dependency injection directly in your migration classes. The migration engine will dispose your migrations when they implement <see cref="IAsyncDisposable" />
-        /// or <see cref="IDisposable" />.
+        /// use dependency injection directly in your migration classes. The migration engine will dispose your migrations when they implement IAsyncDisposable
+        /// or IDisposable.
         /// </para>
         /// <para>
         /// The session factory requires a Func&lt;DataConnection&gt; to be already registered with the DI container.

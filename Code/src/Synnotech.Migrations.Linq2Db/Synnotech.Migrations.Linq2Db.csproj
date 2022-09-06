@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net462</TargetFrameworks>
+        <Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
 		<PackageReleaseNotes>
 Synntech.Migrations.Linq2Db 0.10.1
 ---------------------------------
@@ -13,6 +14,6 @@ Synntech.Migrations.Linq2Db 0.10.1
 		<ProjectReference Include="..\Synnotech.Migrations.Core\Synnotech.Migrations.Core.csproj" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Light.EmbeddedResources" Version="1.1.0" />
-		<PackageReference Include="Synnotech.Linq2Db" Version="6.0.0" />
+		<PackageReference Include="Synnotech.Linq2Db" Version="7.0.0" />
 	</ItemGroup>
 </Project>

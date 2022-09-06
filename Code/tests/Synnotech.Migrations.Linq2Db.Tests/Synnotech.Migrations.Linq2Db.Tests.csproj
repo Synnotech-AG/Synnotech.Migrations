@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <ProjectReference Include="..\..\src\Synnotech.Migrations.Linq2Db\Synnotech.Migrations.Linq2Db.csproj" />
-        <PackageReference Include="Synnotech.MsSqlServer" Version="1.1.0" />
+        <PackageReference Include="Synnotech.MsSqlServer" Version="3.1.0" />
     </ItemGroup>
     <ItemGroup>
         <None Update="testsettings.Development.json" Condition="Exists('testsettings.Development.json')">
