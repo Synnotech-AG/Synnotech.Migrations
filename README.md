@@ -5,16 +5,16 @@
 [![Synnotech Logo](synnotech-large-logo.png)](https://www.synnotech.de/)
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/Synnotech-AG/Synnotech.Migrations/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-0.10.1-blue.svg?style=for-the-badge)](https://www.nuget.org/packages?q=Synnotech.Migrations)
+[![NuGet](https://img.shields.io/badge/NuGet-0.10.2-blue.svg?style=for-the-badge)](https://www.nuget.org/packages?q=Synnotech.Migrations)
 
 When starting a new project, do you always spent too much time on how you can migrate your database? Do you want a migration mechanism that is independent of any persistence technology, like ORMs for relational databases? Worry no more because **Synnotech.Migrations** offers just that! Our generic migration engine is written in such a way so that you can easily adapt it to your own data access layer, no matter the technology: relational databases with and without ORMs, document or graph databases, the file system, or web services - the possibilities are endless.
 
 **Synnotech.Migrations** also offers integration packages that get you started quickly:
 
 - [Raven DB](https://github.com/Synnotech-AG/Synnotech.Migrations/tree/main/Code/src/Synnotech.Migrations.RavenDB)
-- Linq2Db *to be completed*
+- [Linq2Db](https://github.com/Synnotech-AG/Synnotech.Migrations/tree/main/Code/src/Synnotech.Migrations.RavenDB)
 - Entity Framework Core *to be completed*
-- Entity Framework *to be completed*
+- [Entity Framework](https://github.com/Synnotech-AG/Synnotech.Migrations/tree/main/Code/src/Synnotech.Migrations.EntityFramework)
 
 Please visit the corresponding pages for further documentation.
 
