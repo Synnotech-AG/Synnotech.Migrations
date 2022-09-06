@@ -3,10 +3,10 @@
         <TargetFrameworks>netstandard2.0;netstandard2.1;net462</TargetFrameworks>
         <Description>Adapts the generic migration engine of Synnotech.Migrations.Core for Linq2Db.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Linq2Db 0.10.1
+Synntech.Migrations.Linq2Db 0.10.2
 ---------------------------------
 
-- Fixed bug where the latest migration info was not determined correctly by LinqToDbGetLatestMigrationInfoSession for TextVersions (Issue-7)
+- Synnotech.Migrations.Linq2Db now works properly with .NET Framework
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>

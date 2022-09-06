@@ -3,7 +3,7 @@
 		<Authors>Synnotech AG</Authors>
 		<Company>Synnotech AG</Company>
 		<Copyright>Copyright © Synnotech AG 2021</Copyright>
-		<Version>0.10.1</Version>
+		<Version>0.10.2</Version>
 		<LangVersion>10.0</LangVersion>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>

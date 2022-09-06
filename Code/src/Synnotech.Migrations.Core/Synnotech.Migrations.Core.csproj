@@ -4,10 +4,10 @@
 	<PropertyGroup>
 		<Description>Core implementation of a generic migration engine that can be adapted to any target system.</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.Core 0.10.1
+Synntech.Migrations.Core 0.10.2
 --------------------------------
 
-- Fixed bug in Linq2Db where the latest migration info was not determined correctly by LinqToDbGetLatestMigrationInfoSession for TextVersions (Issue-7)
+- Synnotech.Migrations.Linq2Db now works properly with .NET Framework
 - you can find the docs at https://github.com/Synnotech-AG/Synnotech.Migrations
 		</PackageReleaseNotes>
 	</PropertyGroup>

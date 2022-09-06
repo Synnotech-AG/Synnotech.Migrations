@@ -5,7 +5,7 @@
     <PropertyGroup>
 		<Description>Adapts the generic migration engine of Synnotech.Migrations.Core for RavenDB</Description>
 		<PackageReleaseNotes>
-Synntech.Migrations.RavenDB 0.10.1
+Synntech.Migrations.RavenDB 0.10.2
 ---------------------------------
 
 - added support for Synnotech.RavenDB 3.0.0

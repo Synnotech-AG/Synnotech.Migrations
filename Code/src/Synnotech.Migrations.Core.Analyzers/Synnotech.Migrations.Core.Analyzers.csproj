@@ -11,7 +11,7 @@
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <PackageReleaseNotes>
-Synntech.Migrations.Core.Analyzers 0.10.1
+Synntech.Migrations.Core.Analyzers 0.10.2
 --------------------------------------------
 
 - added an additional code fix action that creates the timestamp as an Int64 value
