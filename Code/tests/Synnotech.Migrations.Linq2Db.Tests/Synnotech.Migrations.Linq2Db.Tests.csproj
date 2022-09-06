@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\Synnotech.Migrations.Linq2Db\Synnotech.Migrations.Linq2Db.csproj" />
         <PackageReference Include="Synnotech.MsSqlServer" Version="3.1.0" />
@@ -15,7 +16,6 @@
         </Compile>
         <EmbeddedResource Include="Int64TimestampVersions\InitialScript.sql" />
         <EmbeddedResource Include="TextVersions\0.1.0 Initial Table Structure.sql" />
-        <Analyzer Include="..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll"
-                  Condition="Exists('..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll')" />
+        <Analyzer Include="..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll" Condition="Exists('..\..\src\Synnotech.Migrations.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Synnotech.Migrations.Core.Analyzers.dll')" />
     </ItemGroup>
 </Project>
